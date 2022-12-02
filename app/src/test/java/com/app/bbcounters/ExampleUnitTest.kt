@@ -1,4 +1,4 @@
-package com.example.bbcounters
+package com.app.bbcounters
 
 import org.junit.Test
 

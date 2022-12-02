@@ -1,4 +1,4 @@
-package com.example.bbcounters
+package com.app.bbcounters
 
 import android.net.Uri
 import android.util.Log
