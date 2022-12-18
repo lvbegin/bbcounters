@@ -64,7 +64,6 @@ class DataServer {
                     it,
                     counters.getInt("day_cnt"),
                     counters.getInt("year_cnt"))
-            }
+            }.sorted { it1, it2 -> it1.name.compareTo(it2.name) }
       }
-
 }
