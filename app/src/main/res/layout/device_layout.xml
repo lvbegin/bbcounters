@@ -8,7 +8,10 @@
         android:id="@+id/deviceID"
         android:layout_width="90dp"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:freezesText="false"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:textSize="20dp"
         android:textStyle="bold" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,19 +26,28 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This day: "
+                android:textSize="18dp"
+                android:text="This day:  "
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/daylyCounter"
+                android:textSize="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" This year: "
+                android:textSize="18dp"
+                android:text="This year: "
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/yearlyCounter"
+                android:textSize="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
