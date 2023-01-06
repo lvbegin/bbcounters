@@ -9,6 +9,7 @@
         android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:fontFamily="monospace"
         android:freezesText="false"
         android:gravity="center|center_horizontal|center_vertical"
         android:textSize="20dp"
