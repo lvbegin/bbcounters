@@ -2,6 +2,7 @@ package com.app.bbcounters
 
 import android.content.Context
 import android.os.Bundle
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -45,6 +46,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
+            val actionBar = getSupportActionBar()
+            if (actionBar != null) {
+                actionBar.setDisplayShowHomeEnabled(true)
+                actionBar.setIcon(R.mipmap.ic_launcher_round)
+            }
             recyclerView = findViewById<RecyclerView>(R.id.devicesList)
             val linearLayoutManager = LinearLayoutManager(this)
             recyclerView?.layoutManager = linearLayoutManager

@@ -58,7 +58,12 @@ class BikeCounterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_counter)
-
+        val actionBar = getSupportActionBar()
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true)
+            actionBar.setIcon(R.mipmap.ic_launcher_round)
+        }
+        
         barchart = findViewById(R.id.counterHistoryChart)
 
         val id = intent.extras?.getString("id")
