@@ -65,6 +65,8 @@ class BikeCounterActivity : AppCompatActivity() {
         }
         
         barchart = findViewById(R.id.counterHistoryChart)
+        barchart.setNoDataText("Loading Data...")
+        barchart.setNoDataTextColor(R.color.primaryTextColor)
 
         val id = intent.extras?.getString("id")
         if (id == null)
@@ -97,7 +99,6 @@ class BikeCounterActivity : AppCompatActivity() {
             barchart.axisLeft.setDrawLabels(false)
             barchart.axisLeft.setDrawGridLines(false)
             barchart.axisRight.setDrawGridLines(false)
-
             runOnUiThread {
                 barchart.data = barData
                 barchart.notifyDataSetChanged()
