@@ -1,6 +1,7 @@
 package com.app.bbcounters
 
 import android.support.test.runner.AndroidJUnit4
+import android.util.Log
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,5 +25,13 @@ class DataServerTest {
         assert(1 == deviceCountersArray.size)
         val deviceCounters = deviceCountersArray[0] as BikeCounterValue
         assert(deviceCounters.dayValue <= deviceCounters.yearValue)
+    }
+
+    @Test
+    fun testGetCounterHistoryYear() {
+        val dataServer = DataServer()
+        val someExistingDeviceName = "CJM90"
+        val yearHistory = dataServer.getCounterHistoryYear(someExistingDeviceName, "2023")
+        assert(yearHistory.size > 0)
     }
 }

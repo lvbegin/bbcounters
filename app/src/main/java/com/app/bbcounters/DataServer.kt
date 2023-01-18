@@ -94,4 +94,30 @@ class DataServer {
         }
         return map
     }
+
+    fun getCounterHistoryYear(id : String, year: String) : MutableMap<String, Int> {
+        val firstDayYear = year + "0101"
+        val lastDayYear = year + "1231"
+        val uriCounterHistory = Uri.Builder()
+            .scheme("https")
+            .authority("data.mobility.brussels")
+            .path("bike/api/counts/")
+            .appendQueryParameter("request", "history")
+            .appendQueryParameter("featureID", id)
+            .appendQueryParameter("startDate", firstDayYear)
+            .appendQueryParameter("endDate", lastDayYear)
+            .build().toString();
+        val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
+        val responseAsString = getConnectionOutputString(connection);
+        val data = JSONObject(responseAsString).getJSONArray("data");
+        var map = mutableMapOf<String, Int>()
+        for (i in 0 until data.length()) {
+            val entry = data.getJSONObject(i)
+            val day = entry.get("count_date").toString()
+            val v = entry.getInt("count")
+            map.put(day, map.getOrDefault(day, 0) + v)
+        }
+        return map
+    }
+
 }
