@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onSingleTapUp(p0: MotionEvent?): Boolean = false
 
     override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-        return if (onTop && toast == null && p3 < 0) {
+        return if (onTop && toast == null && p3 < -100) {
             toast = Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT)
             toast?.show()
             loadList()
