@@ -3,14 +3,10 @@ package com.app.bbcounters
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
-import android.support.v4.view.MotionEventCompat
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.OnScrollListener
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -107,8 +103,14 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onSingleTapUp(p0: MotionEvent?): Boolean = false
 
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-        return if (onTop && toast == null && p3 < -100) {
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = false
+
+    override fun onLongPress(p0: MotionEvent?) { }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        if (p0 == null || p1 == null)
+            return false
+        return if (onTop && toast == null && p0.x - p1.x > 50) {
             toast = Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT)
             toast?.show()
             loadList()
@@ -116,9 +118,4 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else
             false
     }
-
-    override fun onLongPress(p0: MotionEvent?) { }
-
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = false
-
 }

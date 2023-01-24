@@ -1,15 +1,17 @@
 package com.app.bbcounters
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.TextView
+import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
@@ -19,6 +21,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
+import kotlin.math.abs
 
 class HistoryAdapter(private val history : MutableMap<String, Int>,
                     private val context : Context) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
@@ -44,8 +47,10 @@ class HistoryAdapter(private val history : MutableMap<String, Int>,
     override fun getItemCount(): Int = history.count()
 }
 
-class BikeCounterActivity : AppCompatActivity() {
+class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListener{
     private lateinit var barchart : BarChart
+    private lateinit var detector : GestureDetectorCompat
+    private lateinit var id: String
 
     companion object {
         fun startActivity(context: Context, id : String) {
@@ -58,19 +63,20 @@ class BikeCounterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_counter)
-        val actionBar = getSupportActionBar()
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true)
-            actionBar.setIcon(R.mipmap.ic_launcher_round)
-        }
-        
+        setIcon(this)
+        detector = GestureDetectorCompat(this,  this)
+
         barchart = findViewById(R.id.counterHistoryChart)
         barchart.setNoDataText("Loading Data...")
         barchart.setNoDataTextColor(R.color.primaryTextColor)
+        barchart.setOnTouchListener( object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean = detector.onTouchEvent(p1)
+        })
 
-        val id = intent.extras?.getString("id")
-        if (id == null)
+        val idIn = intent.extras?.getString("id")
+        if (idIn == null)
             return
+        id = idIn
         Executors.newSingleThreadExecutor().execute {
             val historyData = DataServer().getCounterHistory(id)
             var years = ArrayList<BarEntry>()
@@ -106,4 +112,31 @@ class BikeCounterActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return if (detector.onTouchEvent(event)) {
+            true
+        } else {
+            super.onTouchEvent(event)
+        }
+    }
+
+    override fun onDown(p0: MotionEvent?): Boolean = false
+
+    override fun onShowPress(p0: MotionEvent?) { }
+
+    override fun onSingleTapUp(p0: MotionEvent?): Boolean = false
+
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = false
+
+    override fun onLongPress(p0: MotionEvent?) { }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        if (p0 == null || p1 == null)
+            return false
+        if (p0.y - p1.y > 50)
+            YearCounterActivity.startActivity(this, id)
+        return true
+    }
+
 }
