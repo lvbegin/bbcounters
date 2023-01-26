@@ -44,15 +44,22 @@ class DataServer {
         }
     }
 
-    fun getDevices() : Stream<BikeCounterDevice> {
-        val connection = URL(uriDevices).openConnection() as HttpsURLConnection;
-        val responseAsString = getConnectionOutputString(connection);
-        val features = JSONObject(responseAsString).getJSONArray("features");
-        return IntStream.range(0, features.length())
-            .mapToObj {it -> features.getJSONObject(it) }
-            .map { it -> BikeCounterDevice(
-                it.getJSONObject("properties").getString("device_name"),
-                it.getJSONObject("properties").getString("road_fr"))}
+    fun getDevices() : Stream<BikeCounterDevice>? {
+        return try {
+            val connection = URL(uriDevices).openConnection() as HttpsURLConnection;
+            val responseAsString = getConnectionOutputString(connection);
+            val features = JSONObject(responseAsString).getJSONArray("features");
+            IntStream.range(0, features.length())
+                .mapToObj { it -> features.getJSONObject(it) }
+                .map { it ->
+                    BikeCounterDevice(
+                        it.getJSONObject("properties").getString("device_name"),
+                        it.getJSONObject("properties").getString("road_fr")
+                    )
+                }
+        } catch (e : Exception) {
+            null
+        }
     }
 
     fun getCurrentCounters() : Stream<BikeCounterValue> {
