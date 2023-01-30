@@ -1,17 +1,13 @@
 package com.app.bbcounters
 
-import android.support.v7.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import java.util.concurrent.Executors
@@ -85,22 +81,10 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         Executors.newSingleThreadExecutor().execute {
             val devicesDataArray = DisplayedCountersData.get()
             runOnUiThread {
-                if (devicesDataArray.size == 0)
+                if (devicesDataArray.isEmpty())
                 {
-                    AlertDialog.Builder(this).setTitle("Error")
-                        .setIcon(R.drawable.ic_launcher_foreground)
-                        .setMessage("Cannot read data. Retry?")
-                        .setPositiveButton("YES", object : DialogInterface.OnClickListener {
-                            override fun onClick(dialog: DialogInterface, which : Int) {
-                                this@MainActivity.loadList()
-                            }
-                        })
-                        .setNegativeButton("NO", object : DialogInterface.OnClickListener {
-                            override fun onClick(dialog: DialogInterface, which: Int) {
-                                this@MainActivity.finish()
-                            }
-                        }).create().show()
-               }
+                    askIfRetry(this) { this@MainActivity.loadList() }
+                }
                 else {
                     recyclerView?.adapter = DeviceAdapter(devicesDataArray, this)
                     toast?.cancel()

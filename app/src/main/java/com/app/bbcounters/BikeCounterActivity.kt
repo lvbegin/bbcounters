@@ -1,6 +1,5 @@
 package com.app.bbcounters
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,10 +7,8 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import android.widget.TextView
-import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
@@ -21,7 +18,6 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
-import kotlin.math.abs
 
 class HistoryAdapter(private val history : MutableMap<String, Int>,
                     private val context : Context) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
@@ -77,8 +73,17 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         if (idIn == null)
             return
         id = idIn
+        loadDataIntoGraph()
+    }
+
+    private fun loadDataIntoGraph() {
         Executors.newSingleThreadExecutor().execute {
             val historyData = DataServer().getCounterHistory(id)
+            if (historyData.isEmpty())
+            {
+                askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
+                return@execute
+            }
             var years = ArrayList<BarEntry>()
             for (year in historyData.keys) {
                 val y : Float = Integer.parseInt(year).toFloat()
