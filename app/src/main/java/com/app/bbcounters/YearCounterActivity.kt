@@ -53,7 +53,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                 Log.v("test output", "x = ${x.toString()}, y = ${y.toString()}")
                 dayValues.add(Entry(x, y))
             }
-            var lineDataSet = LineDataSet(dayValues, null)
+            var lineDataSet = LineDataSet(dayValues, "Counter value per day for the current year")
             lineDataSet.setDrawValues(false)
             lineDataSet.color = Color.BLUE
             lineDataSet.circleColors = MutableList(1) { Color.BLUE }
