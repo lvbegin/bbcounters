@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
         if (p0 == null || p1 == null)
             return false
-        return if (onTop && toast == null && p0.x - p1.x > 50) {
+        return if (onTop && toast == null && p0.x - p1.x > 30) {
             toast = Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT)
             toast?.show()
             loadList()
