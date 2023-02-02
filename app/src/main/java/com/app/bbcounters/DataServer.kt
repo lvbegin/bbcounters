@@ -1,8 +1,6 @@
 package com.app.bbcounters
 
 import android.net.Uri
-import android.util.Log
-import android.util.Range
 import org.json.JSONObject
 import java.io.*
 import java.net.URL
