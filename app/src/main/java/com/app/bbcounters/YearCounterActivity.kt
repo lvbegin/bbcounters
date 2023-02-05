@@ -28,12 +28,9 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_year_counter)
         setIcon(this)
-        val idIn = intent.extras?.getString("id")
-        if (idIn == null)
-            return
-        id = idIn
+        id = intent.extras?.getString("id") ?: return
         lineChart = findViewById<LineChart>(R.id.yearlyHistoryChart)
-        lineChart.setNoDataText("Loading Data...")
+        lineChart.setNoDataText(resources.getString(R.string.loading_data))
         lineChart.setNoDataTextColor(R.color.primaryTextColor)
         loadDataIntoGraph()
     }
@@ -53,7 +50,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                 Log.v("test output", "x = ${x.toString()}, y = ${y.toString()}")
                 dayValues.add(Entry(x, y))
             }
-            var lineDataSet = LineDataSet(dayValues, "Counter value per day for the current year")
+            var lineDataSet = LineDataSet(dayValues, getString(R.string.graph_year_counter_label))
             lineDataSet.setDrawValues(false)
             lineDataSet.color = Color.BLUE
             lineDataSet.circleColors = MutableList(1) { Color.BLUE }

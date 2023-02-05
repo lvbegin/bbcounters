@@ -63,7 +63,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         detector = GestureDetectorCompat(this,  this)
 
         barchart = findViewById(R.id.counterHistoryChart)
-        barchart.setNoDataText("Loading Data...")
+        barchart.setNoDataText(resources.getString(R.string.loading_data))
         barchart.setNoDataTextColor(R.color.primaryTextColor)
         barchart.setOnTouchListener( object : View.OnTouchListener {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean = detector.onTouchEvent(p1)
@@ -90,7 +90,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
                 val value : Float = historyData.get(year)!!.toFloat()
                 years.add(BarEntry(y, value))
             }
-            val barDataSet = BarDataSet(years, "years")
+            val barDataSet = BarDataSet(years, getString(R.string.bike_counter_label))
             val barData = BarData(barDataSet)
             barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
             barDataSet.valueTextColor = Color.BLACK
