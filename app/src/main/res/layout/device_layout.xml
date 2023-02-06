@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="10dp"
-                android:text="This day:  " />
+                android:text="@string/this_day" />
             <TextView
                 android:id="@+id/daylyCounter"
                 android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="10dp"
-                android:text="This year: "/>
+                android:text="@string/this_year"/>
             <TextView
                 android:id="@+id/yearlyCounter"
                 android:textSize="20dp"

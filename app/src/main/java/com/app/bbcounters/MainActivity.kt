@@ -31,8 +31,8 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         val yearlyCounterView = holder.view.findViewById<TextView>(R.id.yearlyCounter)
         idTextView.text = devices[position].name
         AddressTextView.text = devices[position].address
-        daylyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else "n/a"
-        yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else "n/a"
+        daylyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else context.resources.getString(R.string.na)
+        yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else context.resources.getString(R.string.na)
         holder.view.setOnClickListener { BikeCounterActivity.startActivity(context, devices[position].name) }
     }
 
@@ -116,11 +116,12 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if (p0 == null || p1 == null)
             return false
         return if (onTop && toast == null && p0.x - p1.x > 30) {
-            toast = Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT)
+            toast = Toast.makeText(this, R.string.loading_message, Toast.LENGTH_SHORT)
             toast?.show()
             loadList()
             true
-        } else
+        } else {
             false
+        }
     }
 }
