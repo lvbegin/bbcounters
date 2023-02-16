@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
+import java.util.stream.Collectors
 
 class HistoryAdapter(private val history : MutableMap<String, Int>,
                     private val context : Context) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
@@ -47,6 +48,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
     private lateinit var barchart : BarChart
     private lateinit var detector : GestureDetectorCompat
     private lateinit var id: String
+    private lateinit var listYears : ArrayList<String>
 
     companion object {
         fun startActivity(context: Context, id : String) {
@@ -84,13 +86,14 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
                 askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
                 return@execute
             }
-            var years = ArrayList<BarEntry>()
-            for (year in historyData.keys) {
+            listYears = ArrayList(historyData.keys)
+            var yearValues = ArrayList<BarEntry>(historyData.keys.stream().map { year ->
                 val y : Float = Integer.parseInt(year).toFloat()
                 val value : Float = historyData.get(year)!!.toFloat()
-                years.add(BarEntry(y, value))
-            }
-            val barDataSet = BarDataSet(years, getString(R.string.bike_counter_label))
+                BarEntry(y, value)
+            }.collect(Collectors.toList()))
+
+            val barDataSet = BarDataSet(yearValues, getString(R.string.bike_counter_label))
             val barData = BarData(barDataSet)
             barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
             barDataSet.valueTextColor = Color.BLACK
@@ -140,7 +143,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         if (p0 == null || p1 == null)
             return false
         if (p0.y - p1.y > 50)
-            YearCounterActivity.startActivity(this, id)
+            YearCounterActivity.startActivity(this, id, listYears)
         return true
     }
 

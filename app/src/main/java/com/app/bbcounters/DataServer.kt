@@ -44,9 +44,9 @@ class DataServer {
 
     fun getDevices() : Stream<BikeCounterDevice>? {
         return try {
-            val connection = URL(uriDevices).openConnection() as HttpsURLConnection;
-            val responseAsString = getConnectionOutputString(connection);
-            val features = JSONObject(responseAsString).getJSONArray("features");
+            val connection = URL(uriDevices).openConnection() as HttpsURLConnection
+            val responseAsString = getConnectionOutputString(connection)
+            val features = JSONObject(responseAsString).getJSONArray("features")
             IntStream.range(0, features.length())
                 .mapToObj { it -> features.getJSONObject(it) }
                 .map { it ->
