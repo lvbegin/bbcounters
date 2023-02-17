@@ -24,6 +24,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
     private lateinit var lineChart: LineChart
     private lateinit var id : String
     private lateinit var listYears : ArrayList<String>
+    private lateinit var spinner : Spinner
 
     companion object {
         fun startActivity(context: Context, id : String, listYears: ArrayList<String>) {
@@ -44,13 +45,12 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         lineChart = findViewById<LineChart>(R.id.yearlyHistoryChart)
         lineChart.setNoDataText(resources.getString(R.string.loading_data))
         lineChart.setNoDataTextColor(R.color.primaryTextColor)
-        val spinner = findViewById<Spinner>(R.id.list_counter_years)
         val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
         for (year in listYears) {
             adapter.add(year)
         }
-
+        spinner = findViewById<Spinner>(R.id.list_counter_years)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -73,6 +73,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         lineChart.clear()
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
+        spinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
 
             var data = DataServer().getCounterHistoryYear(id, year)
@@ -103,6 +104,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
 
             runOnUiThread {
                 lineChart.data = lineData
+                spinner.isEnabled = true
                 lineChart.notifyDataSetChanged()
                 lineChart.invalidate()
             }
