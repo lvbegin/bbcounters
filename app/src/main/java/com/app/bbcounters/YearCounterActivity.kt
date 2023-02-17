@@ -46,10 +46,12 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         lineChart.setNoDataText(resources.getString(R.string.loading_data))
         lineChart.setNoDataTextColor(R.color.primaryTextColor)
         val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
-        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
+//        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
+        adapter.setDropDownViewResource(R.layout.year_item_list_layout)
         for (year in listYears) {
             adapter.add(year)
         }
+
         spinner = findViewById<Spinner>(R.id.list_counter_years)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -66,7 +68,6 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         }
         spinner.adapter = adapter
         spinner.setSelection(listYears.size - 1)
-
     }
 
     fun loadDataIntoGraph(year : String) {
