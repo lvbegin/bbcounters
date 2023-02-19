@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var detector : GestureDetectorCompat
     private var onTop = true
     private var toast: Toast? = null
+    private var devicesDataArray : Array<DisplayedCountersData> ?= null
     override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
@@ -66,7 +67,20 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 onTop = (!recyclerView.canScrollVertically(-1) && dy <= 0)
             }
         })
-        loadList()
+        val savedData = savedInstanceState?.getParcelableArray("data")
+        if (savedData == null) {
+            loadList()
+        }
+        else {
+            val data : Array<DisplayedCountersData> = savedData as Array<DisplayedCountersData>
+            devicesDataArray = data
+            recyclerView?.adapter = DeviceAdapter(data, this)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArray("data", devicesDataArray)
     }
 
     private fun showAppIcon() {
@@ -79,14 +93,16 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private fun loadList() {
         Executors.newSingleThreadExecutor().execute {
-            val devicesDataArray = DisplayedCountersData.get()
+            devicesDataArray = DisplayedCountersData.get()
             runOnUiThread {
-                if (devicesDataArray.isEmpty())
+                val isEmpty = devicesDataArray?.isEmpty() ?: return@runOnUiThread
+                if (isEmpty)
                 {
                     askIfRetry(this) { this@MainActivity.loadList() }
                 }
                 else {
-                    recyclerView?.adapter = DeviceAdapter(devicesDataArray, this)
+                    val data = devicesDataArray ?: return@runOnUiThread
+                    recyclerView?.adapter = DeviceAdapter(data, this)
                     toast?.cancel()
                     toast = null
                 }
