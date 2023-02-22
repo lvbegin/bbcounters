@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -44,12 +46,40 @@ class HistoryAdapter(private val history : MutableMap<String, Int>,
     override fun getItemCount(): Int = history.count()
 }
 
+class ParcelableBarEntry(val v1 : Float, val v2 : Float) : BarEntry(v1, v2), Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readFloat(),
+        parcel.readFloat()
+    ) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        super.writeToParcel(parcel, flags)
+        parcel.writeFloat(v1)
+        parcel.writeFloat(v2)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ParcelableBarEntry> {
+        override fun createFromParcel(parcel: Parcel): ParcelableBarEntry {
+            return ParcelableBarEntry(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ParcelableBarEntry?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
 class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListener{
     private lateinit var barchart : BarChart
     private lateinit var detector : GestureDetectorCompat
     private lateinit var id: String
-    private lateinit var listYears : ArrayList<String>
-
+    private var listYears : ArrayList<String>? = null
+    private var yearValues : List<ParcelableBarEntry>? = null
     companion object {
         fun startActivity(context: Context, id : String) {
             val intent = Intent(context, BikeCounterActivity::class.java)
@@ -75,25 +105,42 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         if (idIn == null)
             return
         id = idIn
+        listYears = savedInstanceState?.getStringArrayList("years")
+        val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList("values")
+        if (values != null)
+            yearValues = values.toList()
         loadDataIntoGraph()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val savedListYears = listYears
+        if (savedListYears != null)
+            outState.putStringArrayList("years", savedListYears)
+        val savedValues = yearValues
+        if (savedValues != null)
+            outState.putParcelableArrayList("values", ArrayList<ParcelableBarEntry>(savedValues))
     }
 
     private fun loadDataIntoGraph() {
         Executors.newSingleThreadExecutor().execute {
-            val historyData = DataServer().getCounterHistory(id)
-            if (historyData.isEmpty())
+            if (listYears == null || yearValues == null)
             {
-                askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
-                return@execute
+                val historyData = DataServer().getCounterHistory(id)
+                if (historyData.isEmpty())
+                {
+                    askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
+                    return@execute
+                }
+                listYears = ArrayList(historyData.keys)
+                yearValues = historyData.keys.stream().map { year ->
+                    val y : Float = Integer.parseInt(year).toFloat()
+                    val value : Float = historyData.get(year)!!.toFloat()
+                    ParcelableBarEntry(y, value)
+                }.collect(Collectors.toList())
             }
-            listYears = ArrayList(historyData.keys)
-            var yearValues = ArrayList<BarEntry>(historyData.keys.stream().map { year ->
-                val y : Float = Integer.parseInt(year).toFloat()
-                val value : Float = historyData.get(year)!!.toFloat()
-                BarEntry(y, value)
-            }.collect(Collectors.toList()))
-
-            val barDataSet = BarDataSet(yearValues, getString(R.string.bike_counter_label))
+            var values = yearValues as List<BarEntry> ?: return@execute
+            val barDataSet = BarDataSet(values, getString(R.string.bike_counter_label))
             val barData = BarData(barDataSet)
             barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
             barDataSet.valueTextColor = Color.BLACK
@@ -140,10 +187,11 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
     override fun onLongPress(p0: MotionEvent?) { }
 
     override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+        val years = listYears ?: return false
         if (p0 == null || p1 == null)
             return false
         if (p0.y - p1.y > 50)
-            YearCounterActivity.startActivity(this, id, listYears)
+            YearCounterActivity.startActivity(this, id, years)
         return true
     }
 
