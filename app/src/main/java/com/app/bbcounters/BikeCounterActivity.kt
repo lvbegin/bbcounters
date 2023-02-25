@@ -46,7 +46,7 @@ class HistoryAdapter(private val history : MutableMap<String, Int>,
     override fun getItemCount(): Int = history.count()
 }
 
-class ParcelableBarEntry(val v1 : Float, val v2 : Float) : BarEntry(v1, v2), Parcelable {
+class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readFloat(),
         parcel.readFloat()
@@ -55,8 +55,8 @@ class ParcelableBarEntry(val v1 : Float, val v2 : Float) : BarEntry(v1, v2), Par
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         super.writeToParcel(parcel, flags)
-        parcel.writeFloat(v1)
-        parcel.writeFloat(v2)
+        parcel.writeFloat(x)
+        parcel.writeFloat(y)
     }
 
     override fun describeContents(): Int {
