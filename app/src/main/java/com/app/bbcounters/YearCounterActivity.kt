@@ -53,10 +53,14 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
     private var entries : List<ParcelableEntry>? = null
     private var currentYearIndex : Int? = null;
     companion object {
+        private const val deviceIdParameter : String = "id"
+        private const val yearParameter : String = "years"
+        private const val entriesSavedState : String = "entries"
+        private const val currentYearSavedState : String = "current"
         fun startActivity(context: Context, id : String, listYears: ArrayList<String>) {
             val intent = Intent(context, YearCounterActivity::class.java)
-            intent.putExtra("id", id)
-            intent.putExtra("years", listYears)
+            intent.putExtra(deviceIdParameter, id)
+            intent.putExtra(yearParameter, listYears)
             context.startActivity(intent)
         }
     }
@@ -65,13 +69,13 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_year_counter)
         setIcon(this)
-        val savedEntries : ArrayList<ParcelableEntry>? = savedInstanceState?.getParcelableArrayList("entries")
+        val savedEntries : ArrayList<ParcelableEntry>? = savedInstanceState?.getParcelableArrayList(entriesSavedState)
         entries = savedEntries?.toList()
 
-        id = intent.extras?.getString("id") ?: return
-        listYears = intent.getSerializableExtra("years") as ArrayList<String>
+        id = intent.extras?.getString(deviceIdParameter) ?: return
+        listYears = intent.getSerializableExtra(yearParameter) as ArrayList<String>
         listYears.sort()
-        val yearIndex = savedInstanceState?.getInt("current") ?: listYears.size - 1
+        val yearIndex = savedInstanceState?.getInt(currentYearSavedState) ?: listYears.size - 1
         lineChart = findViewById<LineChart>(R.id.yearlyHistoryChart)
         lineChart.setNoDataText(resources.getString(R.string.loading_data))
         lineChart.setNoDataTextColor(R.color.primaryTextColor)
@@ -105,9 +109,9 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         val savedEntries = entries
         val savedCurrentYearIndex = currentYearIndex
         if (savedEntries != null)
-            outState.putParcelableArrayList("entries", ArrayList<ParcelableEntry>(savedEntries))
+            outState.putParcelableArrayList(entriesSavedState, ArrayList<ParcelableEntry>(savedEntries))
         if (savedCurrentYearIndex != null)
-            outState.putInt("current", savedCurrentYearIndex)
+            outState.putInt(currentYearSavedState, savedCurrentYearIndex)
     }
 
     fun loadDataIntoGraph(year : String) {
