@@ -81,9 +81,10 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
     private var listYears : ArrayList<String>? = null
     private var yearValues : List<ParcelableBarEntry>? = null
     companion object {
+        private const val deviceIdParameter = "id"
         fun startActivity(context: Context, id : String) {
             val intent = Intent(context, BikeCounterActivity::class.java)
-            intent.putExtra("id", id)
+            intent.putExtra(deviceIdParameter, id)
             context.startActivity(intent)
         }
     }
@@ -101,7 +102,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean = detector.onTouchEvent(p1)
         })
 
-        val idIn = intent.extras?.getString("id")
+        val idIn = intent.extras?.getString(deviceIdParameter)
         if (idIn == null)
             return
         id = idIn
