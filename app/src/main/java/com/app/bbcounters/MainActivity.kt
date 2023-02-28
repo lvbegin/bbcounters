@@ -29,10 +29,11 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         val AddressTextView = holder.view.findViewById<TextView>(R.id.deviceAddress)
         val daylyCounterView = holder.view.findViewById<TextView>(R.id.daylyCounter)
         val yearlyCounterView = holder.view.findViewById<TextView>(R.id.yearlyCounter)
+        val na = context.resources.getString(R.string.na)
         idTextView.text = devices[position].name
         AddressTextView.text = devices[position].address
-        daylyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else context.resources.getString(R.string.na)
-        yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else context.resources.getString(R.string.na)
+        daylyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else na
+        yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else na
         holder.view.setOnClickListener { BikeCounterActivity.startActivity(context, devices[position].name) }
     }
 
