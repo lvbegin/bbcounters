@@ -102,14 +102,10 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean = detector.onTouchEvent(p1)
         })
 
-        val idIn = intent.extras?.getString(deviceIdParameter)
-        if (idIn == null)
-            return
-        id = idIn
+        id = intent.extras?.getString(deviceIdParameter) ?: return
         listYears = savedInstanceState?.getStringArrayList("years")
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList("values")
-        if (values != null)
-            yearValues = values.toList()
+        yearValues = values?.toList()
         loadDataIntoGraph()
     }
 
