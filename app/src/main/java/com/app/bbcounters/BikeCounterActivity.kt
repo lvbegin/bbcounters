@@ -8,9 +8,7 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
-import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.TextView
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
@@ -131,13 +129,9 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return if (detector.onTouchEvent(event)) {
-            true
-        } else {
-            super.onTouchEvent(event)
-        }
-    }
+    override fun onTouchEvent(event: MotionEvent): Boolean = if (detector.onTouchEvent(event)) true else
+                                                                super.onTouchEvent(event)
+
 
     override fun onDown(p0: MotionEvent?): Boolean = false
 
