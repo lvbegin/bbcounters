@@ -41,6 +41,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
 }
 
 class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
+    private val listDevicesParameter = "data"
     private var recyclerView : RecyclerView? = null
     private lateinit var detector : GestureDetectorCompat
     private var onTop = true
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 onTop = (!recyclerView.canScrollVertically(-1) && dy <= 0)
             }
         })
-        val savedData = savedInstanceState?.getParcelableArray("data")
+        val savedData = savedInstanceState?.getParcelableArray(listDevicesParameter)
         if (savedData == null) {
             loadList()
         }
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArray("data", devicesDataArray)
+        outState.putParcelableArray(listDevicesParameter, devicesDataArray)
     }
 
     private fun showAppIcon() {
