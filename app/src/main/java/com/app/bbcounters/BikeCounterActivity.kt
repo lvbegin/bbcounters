@@ -22,36 +22,8 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 
-class HistoryAdapter(private val history : MutableMap<String, Int>,
-                    private val context : Context) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
-    val years = history.keys.sorted().toTypedArray()
-
-    class HistoryViewHolder(val view : View) : RecyclerView.ViewHolder(view) {
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.history_counter, parent, false)
-        return HistoryViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
-        val year = years.get(position)
-        val number = history.get(year);
-        val yearTextView = holder.view.findViewById<TextView>(R.id.historyYear);
-        val numberTextView = holder.view.findViewById<TextView>(R.id.historyValue)
-        yearTextView.text = year
-        numberTextView.text = number.toString()
-    }
-
-    override fun getItemCount(): Int = history.count()
-}
-
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readFloat(),
-        parcel.readFloat()
-    ) {
-    }
+    constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat()) { }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         super.writeToParcel(parcel, flags)
@@ -59,18 +31,12 @@ class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable 
         parcel.writeFloat(y)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     companion object CREATOR : Parcelable.Creator<ParcelableBarEntry> {
-        override fun createFromParcel(parcel: Parcel): ParcelableBarEntry {
-            return ParcelableBarEntry(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel): ParcelableBarEntry = ParcelableBarEntry(parcel)
 
-        override fun newArray(size: Int): Array<ParcelableBarEntry?> {
-            return arrayOfNulls(size)
-        }
+        override fun newArray(size: Int): Array<ParcelableBarEntry?> = arrayOfNulls(size)
     }
 }
 
