@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
-            showAppIcon()
+            setIcon(this)
             detector = GestureDetectorCompat(this,  this)
             recyclerView = findViewById<RecyclerView>(R.id.devicesList)
             val linearLayoutManager = LinearLayoutManager(this)
@@ -83,14 +83,6 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelableArray(listDevicesParameter, devicesDataArray)
-    }
-
-    private fun showAppIcon() {
-        val actionBar = getSupportActionBar()
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true)
-            actionBar.setIcon(R.mipmap.ic_launcher_round)
-        }
     }
 
     private fun loadList() {
