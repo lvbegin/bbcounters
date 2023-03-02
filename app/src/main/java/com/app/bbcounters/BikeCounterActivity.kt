@@ -78,11 +78,11 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         val savedListYears = listYears
-        if (savedListYears != null)
-            outState.putStringArrayList("years", savedListYears)
         val savedValues = yearValues
-        if (savedValues != null)
+        if (savedListYears != null && savedValues != null) {
+            outState.putStringArrayList("years", savedListYears)
             outState.putParcelableArrayList("values", ArrayList<ParcelableBarEntry>(savedValues))
+        }
     }
 
     private fun loadDataIntoGraph() {
