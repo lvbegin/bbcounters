@@ -39,6 +39,8 @@ class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable 
 }
 
 class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListener{
+    private val listYearSavedState = "years"
+    private val graphValuesSavedState = "values"
     private lateinit var barchart : BarChart
     private lateinit var detector : GestureDetectorCompat
     private lateinit var id: String
@@ -67,8 +69,8 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         })
 
         id = intent.extras?.getString(deviceIdParameter) ?: return
-        listYears = savedInstanceState?.getStringArrayList("years")
-        val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList("values")
+        listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
+        val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState)
         yearValues = values?.toList()
         loadDataIntoGraph()
     }
@@ -78,8 +80,8 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         val savedListYears = listYears
         val savedValues = yearValues
         if (savedListYears != null && savedValues != null) {
-            outState.putStringArrayList("years", savedListYears)
-            outState.putParcelableArrayList("values", ArrayList<ParcelableBarEntry>(savedValues))
+            outState.putStringArrayList(listYearSavedState, savedListYears)
+            outState.putParcelableArrayList(graphValuesSavedState, ArrayList<ParcelableBarEntry>(savedValues))
         }
     }
 
