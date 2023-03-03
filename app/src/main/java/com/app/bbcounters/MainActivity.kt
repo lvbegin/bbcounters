@@ -15,9 +15,7 @@ import java.util.concurrent.Executors
 
 class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             private val context : Context) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
-    class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view) {
-        var deviceId : String? = null
-    }
+    class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view) { }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.device_layout, parent, false)
