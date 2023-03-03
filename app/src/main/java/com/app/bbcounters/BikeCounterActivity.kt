@@ -29,7 +29,7 @@ class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable 
         parcel.writeFloat(y)
     }
 
-    override fun describeContents(): Int = 0
+    override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<ParcelableBarEntry> {
         override fun createFromParcel(parcel: Parcel): ParcelableBarEntry = ParcelableBarEntry(parcel)
@@ -131,17 +131,17 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean = if (detector.onTouchEvent(event)) true else
-                                                                super.onTouchEvent(event)
+    override fun onTouchEvent(event: MotionEvent) = if (detector.onTouchEvent(event)) true else
+                                                    super.onTouchEvent(event)
 
 
-    override fun onDown(p0: MotionEvent?): Boolean = false
+    override fun onDown(p0: MotionEvent?) = false
 
     override fun onShowPress(p0: MotionEvent?) { }
 
-    override fun onSingleTapUp(p0: MotionEvent?): Boolean = false
+    override fun onSingleTapUp(p0: MotionEvent?) = false
 
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean = false
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float) = false
 
     override fun onLongPress(p0: MotionEvent?) { }
 
