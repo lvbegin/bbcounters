@@ -6,13 +6,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.Toast
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -25,24 +22,15 @@ import java.util.stream.IntStream
 class ParcelableEntry(x : Float, y : Float) : Entry(x, y), Parcelable {
     constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat()) { }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        super.writeToParcel(parcel, flags)
-    }
+    override fun writeToParcel(parcel: Parcel, flags: Int) = super.writeToParcel(parcel, flags)
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<ParcelableEntry> {
-        override fun createFromParcel(parcel: Parcel): ParcelableEntry {
-            return ParcelableEntry(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel) = ParcelableEntry(parcel)
 
-        override fun newArray(size: Int): Array<ParcelableEntry?> {
-            return arrayOfNulls(size)
-        }
+        override fun newArray(size: Int): Array<ParcelableEntry?>  = arrayOfNulls(size)
     }
-
 }
 
 class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
