@@ -54,8 +54,8 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             val linearLayoutManager = LinearLayoutManager(this)
             recyclerView?.layoutManager = linearLayoutManager
             val dividerItemDecoration = DividerItemDecoration(
-                recyclerView?.getContext(),
-                linearLayoutManager.getOrientation()
+                recyclerView?.context,
+                linearLayoutManager.orientation
             )
         recyclerView?.addItemDecoration(dividerItemDecoration)
         recyclerView?.setOnTouchListener(object : View.OnTouchListener {

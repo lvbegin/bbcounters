@@ -109,12 +109,10 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
             barDataSet.valueTextColor = Color.BLACK
             barDataSet.valueTextSize = 15f
             barchart.description = null
-            barchart.xAxis.valueFormatter = object : IAxisValueFormatter {
-                override fun getFormattedValue(value : Float, axisBase : AxisBase) : String {
+            barchart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
                     val intValue = value.toInt()
-                    return if (intValue.toFloat().equals(value)) intValue.toString() else ""
+                    if (intValue.toFloat().equals(value)) intValue.toString() else ""
                 }
-            }
             barchart.xAxis.granularity = 1f
             barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
             barchart.xAxis.textSize = 12f

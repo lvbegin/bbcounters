@@ -89,7 +89,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         spinner.adapter = adapter
         currentYearIndex = yearIndex
         spinner.setSelection(yearIndex)
-        loadDataIntoGraph(listYears.get(yearIndex))
+        loadDataIntoGraph(listYears[yearIndex])
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -121,7 +121,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                 entries = IntStream.range(0, data.keys.size).mapToObj { i ->
                     ParcelableEntry(
                         i.toFloat(),
-                        data.get(keys.get(i))?.toFloat() ?: 0f
+                        data[keys[i]]?.toFloat() ?: 0f
                     )
                 }.collect(Collectors.toList())
             }
