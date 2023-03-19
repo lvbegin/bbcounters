@@ -11,9 +11,15 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="graph_year_counter_label">Counter value per day for the current year</string>
     <string name="loading_data">"Loading Data..."</string>
-    <string name="bike_counter_label">years</string>
+    <string name="bike_counter_label">Years</string>
+    <string name="year_counter_label">Months</string>
     <string name="na">n/a</string>
     <string name="loading_message">Loading..."</string>
     <string name="this_day">This day:</string>
     <string name="this_year">This year:</string>
+
+    <string-array name="graph_type">
+        <item>Bar Graph</item>
+        <item>Line Graph</item>
+    </string-array>
 </resources>

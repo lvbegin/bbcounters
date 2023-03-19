@@ -10,7 +10,6 @@ import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
 import android.view.*
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -102,7 +101,7 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
                     ParcelableBarEntry(y, value)
                 }.collect(Collectors.toList())
             }
-            var values = yearValues as List<BarEntry> ?: return@execute
+            var values = yearValues as List<BarEntry>
             val barDataSet = BarDataSet(values, getString(R.string.bike_counter_label))
             val barData = BarData(barDataSet)
             barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
@@ -110,9 +109,9 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
             barDataSet.valueTextSize = 15f
             barchart.description = null
             barchart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
-                    val intValue = value.toInt()
-                    if (intValue.toFloat().equals(value)) intValue.toString() else ""
-                }
+                val intValue = value.toInt()
+                if (intValue.toFloat().equals(value)) intValue.toString() else ""
+            }
             barchart.xAxis.granularity = 1f
             barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
             barchart.xAxis.textSize = 12f
