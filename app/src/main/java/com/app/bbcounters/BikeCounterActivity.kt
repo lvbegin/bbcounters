@@ -9,6 +9,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
 import android.view.*
+import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -18,6 +19,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
+import kotlin.math.abs
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
     constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat()) { }
@@ -37,7 +39,29 @@ class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable 
     }
 }
 
-class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListener{
+class BasicSwipe(private val action : () -> Unit) : View.OnTouchListener {
+    private var onDonw : Pair<Float, Float>? = null
+    private var lastBeforeUp : Pair<Float, Float>? = null
+
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+        if (p1 == null)
+            return false
+        when(p1.action) {
+            MotionEvent.ACTION_DOWN -> onDonw = Pair(p1.x, p1.y)
+            MotionEvent.ACTION_UP -> {
+                val deltaX =  (onDonw?.first ?: 0f) - (lastBeforeUp?.first ?: 0f)
+                val deltaY = (onDonw?.second ?: 0f) - (lastBeforeUp?.second ?: 0f)
+                if (deltaX > 400 && abs(deltaY) < 100) {
+                    action()
+                }
+            }
+            MotionEvent.ACTION_MOVE -> lastBeforeUp = Pair(p1.x, p1.y)
+        }
+        return p0?.onTouchEvent(p1) ?: true
+    }
+}
+
+class BikeCounterActivity : AppCompatActivity() {
     private val listYearSavedState = "years"
     private val graphValuesSavedState = "values"
     private lateinit var barchart : BarChart
@@ -45,6 +69,10 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
     private lateinit var id: String
     private var listYears : ArrayList<String>? = null
     private var yearValues : List<ParcelableBarEntry>? = null
+
+    private var onDonw : Pair<Float, Float>? = null
+    private var lastBeforeUp : Pair<Float, Float>? = null
+
     companion object {
         private const val deviceIdParameter = "id"
         fun startActivity(context: Context, id : String) {
@@ -58,17 +86,18 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
-        detector = GestureDetectorCompat(this,  this)
+
+        id = intent.extras?.getString(deviceIdParameter) ?: return
+        listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
 
         barchart = findViewById(R.id.counterHistoryChart)
         barchart.setNoDataText(resources.getString(R.string.loading_data))
         barchart.setNoDataTextColor(R.color.primaryTextColor)
-        barchart.setOnTouchListener( object : View.OnTouchListener {
-            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean = detector.onTouchEvent(p1)
+        barchart.setOnTouchListener(BasicSwipe {
+            val years : ArrayList<String>? = listYears
+            if (years != null)
+                YearCounterActivity.startActivity(this, id, years)
         })
-
-        id = intent.extras?.getString(deviceIdParameter) ?: return
-        listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState)
         yearValues = values?.toList()
         loadDataIntoGraph()
@@ -127,28 +156,4 @@ class BikeCounterActivity : AppCompatActivity(),  GestureDetector.OnGestureListe
             }
         }
     }
-
-    override fun onTouchEvent(event: MotionEvent) = if (detector.onTouchEvent(event)) true else
-                                                    super.onTouchEvent(event)
-
-
-    override fun onDown(p0: MotionEvent?) = false
-
-    override fun onShowPress(p0: MotionEvent?) { }
-
-    override fun onSingleTapUp(p0: MotionEvent?) = false
-
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float) = false
-
-    override fun onLongPress(p0: MotionEvent?) { }
-
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-        val years = listYears ?: return false
-        if (p0 == null || p1 == null)
-            return false
-        if (p0.y - p1.y > 50)
-            YearCounterActivity.startActivity(this, id, years)
-        return true
-    }
-
 }
