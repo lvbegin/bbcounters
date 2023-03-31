@@ -44,20 +44,18 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
 class DownSwipe() : OnTouchListener {
     private val swipeDetector = BasicSwipe()
     private var mustRegister = false
-    private lateinit var swipeIsRelevant : () -> Boolean
-
-    fun setAction(action : () -> Unit) {
-        swipeDetector.action = action
-    }
-
-    fun setCondition(condition : (Pair<Float, Float>, Pair<Float, Float>) -> Boolean) {
-        swipeDetector.condition = condition
-    }
-
+    var swipeIsRelevant : () -> Boolean = { false }
+    @get:Deprecated(message="no getter available", level=DeprecationLevel.ERROR)
+    var action: () -> Unit = { }
+        set(value) { swipeDetector.action = value }
+    @get:Deprecated(message="no getter available", level=DeprecationLevel.ERROR)
+    var condition : (Pair<Float, Float>, Pair<Float, Float>) -> Boolean = {_, _ -> false }
+        set(value) { swipeDetector.condition = value }
+/*
     fun setSwipeIsRelevant(condition : () -> Boolean) {
         this.swipeIsRelevant = condition
     }
-
+*/
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         if (event == null)
             return false
@@ -81,18 +79,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setIcon(this)
-        swipeDetector.setAction {
+        swipeDetector.action = {
             toast = Toast.makeText(this, R.string.loading_message, Toast.LENGTH_SHORT)
             toast?.show()
             loadList()
         }
-        swipeDetector.setCondition { point1, point2 ->
+        swipeDetector.condition = { point1, point2 ->
             val deltaX = point1.first - point2.first
             val deltaY = point1.second - point2.second
 
             (deltaX < 100 && abs(deltaY) > 700)
         }
-        swipeDetector.setSwipeIsRelevant { this.onTop }
+        swipeDetector.swipeIsRelevant = { this.onTop }
 
         recyclerView = findViewById<RecyclerView>(R.id.devicesList)
         val linearLayoutManager = LinearLayoutManager(this)
