@@ -51,11 +51,7 @@ class DownSwipe() : OnTouchListener {
     @get:Deprecated(message="no getter available", level=DeprecationLevel.ERROR)
     var condition : (Pair<Float, Float>, Pair<Float, Float>) -> Boolean = {_, _ -> false }
         set(value) { swipeDetector.condition = value }
-/*
-    fun setSwipeIsRelevant(condition : () -> Boolean) {
-        this.swipeIsRelevant = condition
-    }
-*/
+
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         if (event == null)
             return false
