@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
-import android.view.*
-import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -39,28 +37,6 @@ class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable 
     }
 }
 
-class BasicSwipe(private val action : () -> Unit) : View.OnTouchListener {
-    private var onDonw : Pair<Float, Float>? = null
-    private var lastBeforeUp : Pair<Float, Float>? = null
-
-    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-        if (p1 == null)
-            return false
-        when(p1.action) {
-            MotionEvent.ACTION_DOWN -> onDonw = Pair(p1.x, p1.y)
-            MotionEvent.ACTION_UP -> {
-                val deltaX =  (onDonw?.first ?: 0f) - (lastBeforeUp?.first ?: 0f)
-                val deltaY = (onDonw?.second ?: 0f) - (lastBeforeUp?.second ?: 0f)
-                if (deltaX > 400 && abs(deltaY) < 100) {
-                    action()
-                }
-            }
-            MotionEvent.ACTION_MOVE -> lastBeforeUp = Pair(p1.x, p1.y)
-        }
-        return p0?.onTouchEvent(p1) ?: true
-    }
-}
-
 class BikeCounterActivity : AppCompatActivity() {
     private val listYearSavedState = "years"
     private val graphValuesSavedState = "values"
@@ -69,9 +45,7 @@ class BikeCounterActivity : AppCompatActivity() {
     private lateinit var id: String
     private var listYears : ArrayList<String>? = null
     private var yearValues : List<ParcelableBarEntry>? = null
-
-    private var onDonw : Pair<Float, Float>? = null
-    private var lastBeforeUp : Pair<Float, Float>? = null
+    private val swipeDetector = BasicSwipe()
 
     companion object {
         private const val deviceIdParameter = "id"
@@ -86,18 +60,23 @@ class BikeCounterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
-
+        swipeDetector.action  = {
+            val years : ArrayList<String>? = listYears
+            if (years != null)
+                YearCounterActivity.startActivity(this, id, years)
+        }
+        swipeDetector.condition = { point1, point2 ->
+            val deltaX =  point1.first - point2.first
+            val deltaY = point1.second - point2.second
+             (deltaX > 400 && abs(deltaY) < 100)
+        }
         id = intent.extras?.getString(deviceIdParameter) ?: return
         listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
 
         barchart = findViewById(R.id.counterHistoryChart)
         barchart.setNoDataText(resources.getString(R.string.loading_data))
         barchart.setNoDataTextColor(R.color.primaryTextColor)
-        barchart.setOnTouchListener(BasicSwipe {
-            val years : ArrayList<String>? = listYears
-            if (years != null)
-                YearCounterActivity.startActivity(this, id, years)
-        })
+        barchart.setOnTouchListener(swipeDetector)
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState)
         yearValues = values?.toList()
         loadDataIntoGraph()
