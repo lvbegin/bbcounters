@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.v4.view.GestureDetectorCompat
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -15,8 +18,13 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
+import java.time.LocalDateTime
+import java.time.Year
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
@@ -42,7 +50,12 @@ class BikeCounterActivity : AppCompatActivity() {
     private val graphValuesSavedState = "values"
     private lateinit var barchart : BarChart
     private lateinit var detector : GestureDetectorCompat
+    private lateinit var progressbar : ProgressBar
+    private lateinit var progressBarText : TextView
     private lateinit var id: String
+    private var firstYear = 2018
+    private var thisYear  = 0
+
     private var listYears : ArrayList<String>? = null
     private var yearValues : List<ParcelableBarEntry>? = null
     private val swipeDetector = BasicSwipe()
@@ -72,11 +85,14 @@ class BikeCounterActivity : AppCompatActivity() {
         }
         id = intent.extras?.getString(deviceIdParameter) ?: return
         listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
-
+        thisYear  = Calendar.getInstance().get(Calendar.YEAR)
+        progressbar = findViewById(R.id.progressBarBikeCounter)
+        progressBarText = findViewById(R.id.progressBarText)
         barchart = findViewById(R.id.counterHistoryChart)
         barchart.setNoDataText(resources.getString(R.string.loading_data))
         barchart.setNoDataTextColor(R.color.primaryTextColor)
         barchart.setOnTouchListener(swipeDetector)
+        barchart.visibility = View.INVISIBLE
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState)
         yearValues = values?.toList()
         loadDataIntoGraph()
@@ -96,43 +112,61 @@ class BikeCounterActivity : AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (listYears == null || yearValues == null)
             {
-                val historyData = DataServer().getCounterHistory(id)
-                if (historyData.isEmpty())
+                var years = ArrayList<String>()
+                var values = mutableListOf<ParcelableBarEntry>()
+                listYears = years
+                yearValues = values
+                for (i in firstYear..thisYear)
                 {
-                    askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
-                    return@execute
+                    runOnUiThread {
+                        progressBarText.text = "Loadind data for ${i.toString()}"
+                    }
+                    val data = DataServer().getCounterHistoryYear(id, i.toString())
+                    if (data.isEmpty())
+                    {
+                        askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
+                        return@execute
+                    }
+                    val value = data.values.stream().reduce(0, Integer::sum)
+                    if (value == 0)
+                    {
+                        continue
+                    }
+                    values.add(ParcelableBarEntry(i.toFloat(), value.toFloat()))
+                    years.add(i.toString())
+                    Log.v("test output", "${values.toString()}")
                 }
-                listYears = ArrayList(historyData.keys)
-                yearValues = historyData.keys.stream().map { year ->
-                    val y : Float = Integer.parseInt(year).toFloat()
-                    val value : Float = historyData.get(year)!!.toFloat()
-                    ParcelableBarEntry(y, value)
-                }.collect(Collectors.toList())
             }
-            var values = yearValues as List<BarEntry>
-            val barDataSet = BarDataSet(values, getString(R.string.bike_counter_label))
-            val barData = BarData(barDataSet)
-            barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
-            barDataSet.valueTextColor = Color.BLACK
-            barDataSet.valueTextSize = 15f
-            barchart.description = null
-            barchart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
-                val intValue = value.toInt()
-                if (intValue.toFloat().equals(value)) intValue.toString() else ""
-            }
-            barchart.xAxis.granularity = 1f
-            barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-            barchart.xAxis.textSize = 12f
-            barchart.xAxis.setDrawGridLines(false)
-            barchart.axisRight.setDrawLabels(false)
-            barchart.axisLeft.setDrawLabels(false)
-            barchart.axisLeft.setDrawGridLines(false)
-            barchart.axisRight.setDrawGridLines(false)
-            runOnUiThread {
-                barchart.data = barData
-                barchart.notifyDataSetChanged()
-                barchart.invalidate()
-            }
+            updateGraph()
+        }
+    }
+    private fun updateGraph() {
+        val values = yearValues as List<BarEntry>
+        val barDataSet = BarDataSet(values, getString(R.string.bike_counter_label))
+        val barData = BarData(barDataSet)
+        barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
+        barDataSet.valueTextColor = Color.BLACK
+        barDataSet.valueTextSize = 15f
+        barchart.description = null
+        barchart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
+            val intValue = value.toInt()
+            if (intValue.toFloat().equals(value)) intValue.toString() else ""
+        }
+        barchart.xAxis.granularity = 1f
+        barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        barchart.xAxis.textSize = 12f
+        barchart.xAxis.setDrawGridLines(false)
+        barchart.axisRight.setDrawLabels(false)
+        barchart.axisLeft.setDrawLabels(false)
+        barchart.axisLeft.setDrawGridLines(false)
+        barchart.axisRight.setDrawGridLines(false)
+        runOnUiThread {
+            progressbar.visibility = View.INVISIBLE
+            progressBarText.visibility = View.INVISIBLE
+            barchart.visibility = View.VISIBLE
+            barchart.data = barData
+            barchart.notifyDataSetChanged()
+            barchart.invalidate()
         }
     }
 }

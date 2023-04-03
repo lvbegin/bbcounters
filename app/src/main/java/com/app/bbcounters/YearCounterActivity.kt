@@ -9,6 +9,7 @@ import android.os.Parcelable
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ProgressBar
 import android.widget.Spinner
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -27,7 +28,7 @@ class ParcelableMap : Parcelable {
     constructor(parcel: Parcel)  {
         this.map = mutableMapOf<String, Int>()
         val size = parcel.readInt()
-        for (i in 1..size) {
+        (1..size).forEach { _ ->
             val key = parcel.readString()
             val value = parcel.readInt()
             if (key != null)
@@ -35,9 +36,7 @@ class ParcelableMap : Parcelable {
         }
     }
 
-    constructor(map : MutableMap<String, Int>) {
-        this.map = map
-    }
+    constructor(map : MutableMap<String, Int>) { this.map = map }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(this.map.size)
@@ -67,6 +66,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
     private lateinit var listYears : ArrayList<String>
     private lateinit var yearSpinner : Spinner
     private lateinit var graphTypeSpinner : Spinner
+    private lateinit var progressBar : ProgressBar
     private var currentYearIndex : Int? = null;
     private var lineGraphType = false
     companion object {
@@ -131,11 +131,10 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         lineChart = findViewById<LineChart>(R.id.yearlyHistoryLineChart)
         lineChart?.setNoDataText(resources.getString(R.string.loading_data))
         lineChart?.setNoDataTextColor(R.color.primaryTextColor)
-        lineChart?.visibility = View.VISIBLE
         barChart = findViewById<BarChart>(R.id.yearlyHistoryBarChart)
         barChart?.setNoDataText(resources.getString(R.string.loading_data))
         barChart?.setNoDataTextColor(R.color.primaryTextColor)
-        barChart?.visibility = View.INVISIBLE
+        progressBar = findViewById(R.id.progressBarYearBikeCounter)
         loadDataIntoGraph(listYears[yearIndex])
     }
 
@@ -157,13 +156,13 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
             loadDataIntoBarGraph(year)
     }
     fun loadDataIntoLineGraph(year : String) {
+        barChart?.visibility = View.INVISIBLE
+        lineChart?.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
         lineChart?.clear()
-        lineChart?.notifyDataSetChanged()
-        lineChart?.invalidate()
         yearSpinner.isEnabled = false
         graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
-
             if (dataFromServer == null) {
                 var data = DataServer().getCounterHistoryYear(id, year)
                 if (data.isEmpty()) {
@@ -200,6 +199,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
             runOnUiThread {
                 lineChart?.visibility = View.VISIBLE
                 barChart?.visibility = View.INVISIBLE
+                progressBar.visibility = View.INVISIBLE
                 lineChart?.data = lineData
                 yearSpinner.isEnabled = true
                 graphTypeSpinner.isEnabled = true
@@ -210,9 +210,10 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         }
     }
     fun loadDataIntoBarGraph(year : String) {
+        barChart?.visibility = View.INVISIBLE
+        lineChart?.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
         barChart?.clear()
-        barChart?.notifyDataSetChanged()
-        barChart?.invalidate()
         yearSpinner.isEnabled = false
         graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
@@ -265,6 +266,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
             runOnUiThread {
                 barChart?.visibility = View.VISIBLE
                 lineChart?.visibility = View.INVISIBLE
+                progressBar.visibility = View.INVISIBLE
                 barChart?.data = barData
                 yearSpinner.isEnabled = true
                 graphTypeSpinner.isEnabled = true
