@@ -165,11 +165,13 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
                 var data = DataServer().getCounterHistoryYear(id, year)
-                if (data.isEmpty()) {
+                if (data.isFailure) {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
                 }
-                dataFromServer = ParcelableMap(data)
+                data.onSuccess {
+                    dataFromServer = ParcelableMap(it)
+                }
             }
             var data = dataFromServer?.map ?: return@execute
             var keys = data.keys.toTypedArray()
@@ -219,11 +221,13 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
                 var data = DataServer().getCounterHistoryYear(id, year)
-                if (data.isEmpty()) {
+                if (data.isFailure) {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
                 }
-                dataFromServer = ParcelableMap(data)
+                data.onSuccess {
+                    dataFromServer = ParcelableMap(it)
+                }
             }
             var data = dataFromServer?.map ?: return@execute
             var keys = data.keys.toTypedArray()

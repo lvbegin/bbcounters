@@ -28,43 +28,51 @@ class DataServer {
         .appendQueryParameter("request", "live")
         .build().toString();
 
-    private fun getConnectionOutputString(con : HttpsURLConnection) : String {
+    private fun getConnectionOutputString(con : HttpsURLConnection) : Result<String> {
         try {
             con.doOutput = true;
             con.requestMethod = "GET";
             val input = BufferedReader(InputStreamReader(con.inputStream));
             var rc = "";
-            input.forEachLine { rc += it; };
-            return rc;
+            if (con.responseMessage != "OK")
+                return Result.failure(Exception("Get request failed"))
+            input.forEachLine { rc += it; }
+            return Result.success(rc)
         } finally {
             Log.v("test output", con.responseMessage)
             Log.v("test output", con.responseCode.toString())
         }
     }
 
-    fun getDevices() : Stream<BikeCounterDevice>? {
+    fun getDevices() : Result<Stream<BikeCounterDevice>> {
         return try {
             val connection = URL(uriDevices).openConnection() as HttpsURLConnection
             val responseAsString = getConnectionOutputString(connection)
-            val features = JSONObject(responseAsString).getJSONArray("features")
-            IntStream.range(0, features.length())
-                .mapToObj { it -> features.getJSONObject(it) }
-                .map { it ->
-                    BikeCounterDevice(
-                        it.getJSONObject("properties").getString("device_name"),
-                        it.getJSONObject("properties").getString("road_fr")
-                    )
-                }
+            if (responseAsString.isFailure)
+                return Result.failure(Exception("Cannot get devices information"))
+            val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get devices information"))
+            val features = JSONObject(response).getJSONArray("features")
+            Result.success(IntStream.range(0, features.length())
+                    .mapToObj { it -> features.getJSONObject(it) }
+                    .map { it ->
+                        BikeCounterDevice(
+                            it.getJSONObject("properties").getString("device_name"),
+                            it.getJSONObject("properties").getString("road_fr")
+                        )
+                    })
         } catch (e : Exception) {
-            null
+            Result.failure(Exception("Cannot get devices information"))
         }
     }
 
-    fun getCurrentCounters() : Stream<BikeCounterValue> {
-        val connection = URL(uriCurrentCounters).openConnection() as HttpsURLConnection;
-        val responseAsString = getConnectionOutputString(connection);
-        val data = JSONObject(responseAsString).getJSONObject("data");
-        return StreamSupport
+    fun getCurrentCounters() : Result<Stream<BikeCounterValue>> {
+        val connection = URL(uriCurrentCounters).openConnection() as HttpsURLConnection
+        val responseAsString = getConnectionOutputString(connection)
+        if (responseAsString.isFailure)
+            return Result.failure(Exception("Cannot get current counters"))
+        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get current counters"))
+        val data = JSONObject(response).getJSONObject("data")
+        return Result.success(StreamSupport
             .stream(Spliterators.spliteratorUnknownSize(data.keys(),Spliterator.ORDERED), false)
             .map {
                 val counters = data.getJSONObject(it)
@@ -72,10 +80,10 @@ class DataServer {
                     it,
                     counters.getInt("day_cnt"),
                     counters.getInt("year_cnt"))
-            }.sorted { it1, it2 -> it1.name.compareTo(it2.name) }
+            }.sorted { it1, it2 -> it1.name.compareTo(it2.name) })
       }
 
-    fun getCounterHistory(id : String) : MutableMap<String, Int> {
+    fun getCounterHistory(id : String) : Result<MutableMap<String, Int>> {
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val currentDate = sdf.format(Date())
         val uriCounterHistory = Uri.Builder()
@@ -89,7 +97,10 @@ class DataServer {
             .build().toString();
         val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
         val responseAsString = getConnectionOutputString(connection);
-        val data = JSONObject(responseAsString).getJSONArray("data");
+        if (responseAsString.isFailure)
+            return Result.failure(Exception("Cannot get counter history"))
+        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get counter history"))
+        val data = JSONObject(response).getJSONArray("data");
         var map = mutableMapOf<String, Int>()
         for (i in 0 until data.length()) {
             val entry = data.getJSONObject(i)
@@ -97,10 +108,10 @@ class DataServer {
             val v = entry.getInt("count")
             map.put(year, map.getOrDefault(year, 0) + v)
         }
-        return map
+        return Result.success(map)
     }
 
-    fun getCounterHistoryYear(id : String, year: String) : MutableMap<String, Int> {
+    fun getCounterHistoryYear(id : String, year: String) : Result<MutableMap<String, Int>> {
         val firstDayYear = year + "0101"
         val lastDayYear = year + "1231"
         val uriCounterHistory = Uri.Builder()
@@ -114,7 +125,10 @@ class DataServer {
             .build().toString();
         val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
         val responseAsString = getConnectionOutputString(connection);
-        val data = JSONObject(responseAsString).getJSONArray("data");
+        if (responseAsString.isFailure)
+            return Result.failure(Exception("Cannot get yearly counter history"))
+        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get yearly counter history"))
+        val data = JSONObject(response).getJSONArray("data");
         var map = mutableMapOf<String, Int>()
         for (i in 0 until data.length()) {
             val entry = data.getJSONObject(i)
@@ -122,7 +136,7 @@ class DataServer {
             val v = entry.getInt("count")
             map.put(day, map.getOrDefault(day, 0) + v)
         }
-        return map
+        return Result.success(map)
     }
 
 }

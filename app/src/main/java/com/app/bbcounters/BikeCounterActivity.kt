@@ -122,19 +122,20 @@ class BikeCounterActivity : AppCompatActivity() {
                         progressBarText.text = "Loadind data for ${i.toString()}"
                     }
                     val data = DataServer().getCounterHistoryYear(id, i.toString())
-                    if (data.isEmpty())
+                    if (data.isFailure)
                     {
                         askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
                         return@execute
                     }
-                    val value = data.values.stream().reduce(0, Integer::sum)
-                    if (value == 0)
-                    {
-                        continue
+                    data.onSuccess {
+                        val value = it.values.stream().reduce(0, Integer::sum)
+                        if (value > 0)
+                        {
+                            values.add(ParcelableBarEntry(i.toFloat(), value.toFloat()))
+                            years.add(i.toString())
+                            Log.v("test output", "${values.toString()}")
+                        }
                     }
-                    values.add(ParcelableBarEntry(i.toFloat(), value.toFloat()))
-                    years.add(i.toString())
-                    Log.v("test output", "${values.toString()}")
                 }
             }
             updateGraph()
