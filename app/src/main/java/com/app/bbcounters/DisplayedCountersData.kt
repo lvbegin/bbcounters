@@ -2,7 +2,6 @@ package com.app.bbcounters
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.stream.Stream
 
 class DisplayedCountersData private constructor(val name : String, val address : String,
                                                 val dayValue : Int, val yearValue : Int) : Parcelable {
@@ -20,15 +19,12 @@ class DisplayedCountersData private constructor(val name : String, val address :
         parcel.writeInt(yearValue)
     }
 
-    override fun describeContents(): Int = 0
+    override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<DisplayedCountersData> {
-        override fun createFromParcel(parcel: Parcel): DisplayedCountersData {
-            return DisplayedCountersData(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel) = DisplayedCountersData(parcel)
 
         override fun newArray(size: Int): Array<DisplayedCountersData?> = arrayOfNulls(size)
-
 
         fun get() : Array<DisplayedCountersData>  {
             val dataServer = DataServer()
@@ -40,7 +36,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
             val currentCountersFromServer = dataServer.getCurrentCounters()
                 if (currentCountersFromServer.isFailure)
                     return emptyArray()
-            val currentCounters = currentCountersFromServer?.getOrNull()?.sorted { it, it2 -> it.name.compareTo(it2.name) }
+            val currentCounters = currentCountersFromServer.getOrNull()?.sorted { it, it2 -> it.name.compareTo(it2.name) }
                 ?: return emptyArray()
             val currentCountersArray = currentCounters.toArray<BikeCounterValue> { length -> arrayOfNulls<BikeCounterValue>(length) }
 
