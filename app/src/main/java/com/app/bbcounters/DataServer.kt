@@ -66,77 +66,65 @@ class DataServer {
     }
 
     fun getCurrentCounters() : Result<Stream<BikeCounterValue>> {
-        val connection = URL(uriCurrentCounters).openConnection() as HttpsURLConnection
-        val responseAsString = getConnectionOutputString(connection)
-        if (responseAsString.isFailure)
-            return Result.failure(Exception("Cannot get current counters"))
-        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get current counters"))
-        val data = JSONObject(response).getJSONObject("data")
-        return Result.success(StreamSupport
-            .stream(Spliterators.spliteratorUnknownSize(data.keys(),Spliterator.ORDERED), false)
-            .map {
-                val counters = data.getJSONObject(it)
-                BikeCounterValue(
-                    it,
-                    counters.getInt("day_cnt"),
-                    counters.getInt("year_cnt"))
-            }.sorted { it1, it2 -> it1.name.compareTo(it2.name) })
+        return try {
+            val connection = URL(uriCurrentCounters).openConnection() as HttpsURLConnection
+            val responseAsString = getConnectionOutputString(connection)
+            if (responseAsString.isFailure)
+                return Result.failure(Exception("Cannot get current counters"))
+            val response = responseAsString.getOrNull()
+                ?: return Result.failure(Exception("Cannot get current counters"))
+            val data = JSONObject(response).getJSONObject("data")
+            return Result.success(StreamSupport
+                .stream(
+                    Spliterators.spliteratorUnknownSize(data.keys(), Spliterator.ORDERED),
+                    false
+                )
+                .map {
+                    val counters = data.getJSONObject(it)
+                    BikeCounterValue(
+                        it,
+                        counters.getInt("day_cnt"),
+                        counters.getInt("year_cnt")
+                    )
+                }.sorted { it1, it2 -> it1.name.compareTo(it2.name) })
+        }
+        catch (e : Exception) {
+            Result.failure(Exception("Cannot get current counter"))
+        }
       }
 
-    fun getCounterHistory(id : String) : Result<MutableMap<String, Int>> {
-        val sdf = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        val currentDate = sdf.format(Date())
-        val uriCounterHistory = Uri.Builder()
-            .scheme("https")
-            .authority("data.mobility.brussels")
-            .path("bike/api/counts/")
-            .appendQueryParameter("request", "history")
-            .appendQueryParameter("featureID", id)
-            .appendQueryParameter("startDate", "20181205")
-            .appendQueryParameter("endDate", currentDate)
-            .build().toString();
-        val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
-        val responseAsString = getConnectionOutputString(connection);
-        if (responseAsString.isFailure)
-            return Result.failure(Exception("Cannot get counter history"))
-        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get counter history"))
-        val data = JSONObject(response).getJSONArray("data");
-        var map = mutableMapOf<String, Int>()
-        for (i in 0 until data.length()) {
-            val entry = data.getJSONObject(i)
-            val year = entry.get("count_date").toString().slice(IntRange(0, 3))
-            val v = entry.getInt("count")
-            map.put(year, map.getOrDefault(year, 0) + v)
-        }
-        return Result.success(map)
-    }
-
     fun getCounterHistoryYear(id : String, year: String) : Result<MutableMap<String, Int>> {
-        val firstDayYear = year + "0101"
-        val lastDayYear = year + "1231"
-        val uriCounterHistory = Uri.Builder()
-            .scheme("https")
-            .authority("data.mobility.brussels")
-            .path("bike/api/counts/")
-            .appendQueryParameter("request", "history")
-            .appendQueryParameter("featureID", id)
-            .appendQueryParameter("startDate", firstDayYear)
-            .appendQueryParameter("endDate", lastDayYear)
-            .build().toString();
-        val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
-        val responseAsString = getConnectionOutputString(connection);
-        if (responseAsString.isFailure)
-            return Result.failure(Exception("Cannot get yearly counter history"))
-        val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get yearly counter history"))
-        val data = JSONObject(response).getJSONArray("data");
-        var map = mutableMapOf<String, Int>()
-        for (i in 0 until data.length()) {
-            val entry = data.getJSONObject(i)
-            val day = entry.get("count_date").toString()
-            val v = entry.getInt("count")
-            map.put(day, map.getOrDefault(day, 0) + v)
+        return try {
+            val firstDayYear = year + "0101"
+            val lastDayYear = year + "1231"
+            val uriCounterHistory = Uri.Builder()
+                .scheme("https")
+                .authority("data.mobility.brussels")
+                .path("bike/api/counts/")
+                .appendQueryParameter("request", "history")
+                .appendQueryParameter("featureID", id)
+                .appendQueryParameter("startDate", firstDayYear)
+                .appendQueryParameter("endDate", lastDayYear)
+                .build().toString();
+            val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
+            val responseAsString = getConnectionOutputString(connection);
+            if (responseAsString.isFailure)
+                return Result.failure(Exception("Cannot get yearly counter history"))
+            val response = responseAsString.getOrNull()
+                ?: return Result.failure(Exception("Cannot get yearly counter history"))
+            val data = JSONObject(response).getJSONArray("data");
+            var map = mutableMapOf<String, Int>()
+            for (i in 0 until data.length()) {
+                val entry = data.getJSONObject(i)
+                val day = entry.get("count_date").toString()
+                val v = entry.getInt("count")
+                map.put(day, map.getOrDefault(day, 0) + v)
+            }
+            return Result.success(map)
         }
-        return Result.success(map)
+        catch (e : Exception) {
+            Result.failure(Exception("Cannot get yearly counter history"))
+        }
     }
 
 }
