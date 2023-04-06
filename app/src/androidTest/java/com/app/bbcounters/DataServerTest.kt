@@ -12,16 +12,22 @@ class DataServerTest {
     fun testGetDeviceList() {
         val dataServer = DataServer()
         val output = dataServer.getDevices()
+        assert(output.isSuccess)
         val someExistingDeviceName = "CJM90"
-        assert(1 == output.filter { it.name == someExistingDeviceName }.count().toInt())
+        val outputValues = output.getOrNull()
+        assert(outputValues != null)
+        assert(1 == outputValues!!.filter { it.name == someExistingDeviceName }.count().toInt())
     }
 
     @Test
     fun testGetCountersValues() {
         val dataServer = DataServer()
         val counters = dataServer.getCurrentCounters()
+        assert(counters.isSuccess)
         val someExistingDeviceName = "CJM90"
-        val deviceCountersArray = counters.filter { it.name == someExistingDeviceName }.toArray()
+        val counterValues = counters.getOrNull()
+        assert(counterValues != null)
+        val deviceCountersArray = counterValues!!.filter { it.name == someExistingDeviceName }.toArray()
         assert(1 == deviceCountersArray.size)
         val deviceCounters = deviceCountersArray[0] as BikeCounterValue
         assert(deviceCounters.dayValue <= deviceCounters.yearValue)
@@ -32,6 +38,9 @@ class DataServerTest {
         val dataServer = DataServer()
         val someExistingDeviceName = "CJM90"
         val yearHistory = dataServer.getCounterHistoryYear(someExistingDeviceName, "2023")
-        assert(yearHistory.size > 0)
+        assert(yearHistory.isSuccess)
+        val yearHistoryValues = yearHistory.getOrNull()
+        assert(yearHistoryValues != null)
+        assert(yearHistoryValues!!.isNotEmpty())
     }
 }
