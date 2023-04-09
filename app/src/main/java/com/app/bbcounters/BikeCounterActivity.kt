@@ -51,6 +51,7 @@ class BikeCounterActivity : AppCompatActivity() {
     private lateinit var barchart : BarChart
     private lateinit var detector : GestureDetectorCompat
     private lateinit var progressbar : ProgressBar
+    private lateinit var progressbar2 : ProgressBar
     private lateinit var progressBarText : TextView
     private lateinit var id: String
     private var firstYear = 2018
@@ -87,6 +88,7 @@ class BikeCounterActivity : AppCompatActivity() {
         listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
         thisYear  = Calendar.getInstance().get(Calendar.YEAR)
         progressbar = findViewById(R.id.progressBarBikeCounter)
+        progressbar2 = findViewById(R.id.progressBarBikeCounter2)
         progressBarText = findViewById(R.id.progressBarText)
         barchart = findViewById(R.id.counterHistoryChart)
         barchart.setNoDataText(resources.getString(R.string.loading_data))
@@ -109,6 +111,8 @@ class BikeCounterActivity : AppCompatActivity() {
     }
 
     private fun loadDataIntoGraph() {
+        progressbar.max = thisYear - firstYear + 1
+        progressbar.progress = 0
         Executors.newSingleThreadExecutor().execute {
             if (listYears == null || yearValues == null)
             {
@@ -134,6 +138,9 @@ class BikeCounterActivity : AppCompatActivity() {
                             values.add(ParcelableBarEntry(i.toFloat(), value.toFloat()))
                             years.add(i.toString())
                             Log.v("test output", "${values.toString()}")
+                        }
+                        runOnUiThread {
+                            progressbar.progress++
                         }
                     }
                 }
@@ -163,6 +170,7 @@ class BikeCounterActivity : AppCompatActivity() {
         barchart.axisRight.setDrawGridLines(false)
         runOnUiThread {
             progressbar.visibility = View.INVISIBLE
+            progressbar2.visibility = View.INVISIBLE
             progressBarText.visibility = View.INVISIBLE
             barchart.visibility = View.VISIBLE
             barchart.data = barData
