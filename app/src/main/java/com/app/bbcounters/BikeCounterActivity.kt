@@ -126,8 +126,7 @@ class BikeCounterActivity : AppCompatActivity() {
                         progressBarText.text = "Loadind data for ${i.toString()}"
                     }
                     val data = DataServer().getCounterHistoryYear(id, i.toString())
-                    if (data.isFailure)
-                    {
+                    data.onFailure {
                         askIfRetry(this@BikeCounterActivity) { this@BikeCounterActivity.loadDataIntoGraph() }
                         return@execute
                     }

@@ -165,7 +165,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
                 var data = DataServer().getCounterHistoryYear(id, year)
-                if (data.isFailure) {
+                data.onFailure {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
                 }
@@ -221,7 +221,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
                 var data = DataServer().getCounterHistoryYear(id, year)
-                if (data.isFailure) {
+                data.onFailure {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
                 }
