@@ -111,7 +111,7 @@ class BikeCounterActivity : AppCompatActivity() {
     }
 
     private fun loadDataIntoGraph() {
-        progressbar.max = thisYear - firstYear + 1
+        progressbar.max = thisYear - firstYear
         progressbar.progress = 0
         Executors.newSingleThreadExecutor().execute {
             if (listYears == null || yearValues == null)
