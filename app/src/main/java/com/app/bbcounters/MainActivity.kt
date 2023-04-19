@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             val deltaX = point1.first - point2.first
             val deltaY = point1.second - point2.second
 
-            (deltaX < 100 && abs(deltaY) > 700)
+            (point1.second < 50 && abs(deltaX) < 100 && deltaY < -700)
         }
         swipeDetector.swipeIsRelevant = { this.onTop }
 
