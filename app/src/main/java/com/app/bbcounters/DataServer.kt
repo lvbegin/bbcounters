@@ -1,12 +1,12 @@
 package com.app.bbcounters
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import org.json.JSONObject
 import java.io.*
 import java.net.URL
-import java.text.SimpleDateFormat
 import java.util.*
-import java.util.Locale
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
@@ -57,12 +57,22 @@ class DataServer {
                     .map { it ->
                         BikeCounterDevice(
                             it.getJSONObject("properties").getString("device_name"),
-                            it.getJSONObject("properties").getString("road_fr")
+                            it.getJSONObject("properties").getString("road_fr"),
+                            it.getJSONObject("properties").getString("picture_1")
                         )
                     })
         } catch (e : Exception) {
             Result.failure(Exception("Cannot get devices information"))
         }
+    }
+
+    fun getPictures(device : BikeCounterDevice) : Result<Bitmap> {
+            return try {
+                val connection = URL(device.pictureURL).openConnection() as HttpsURLConnection
+                Result.success(BitmapFactory.decodeStream(connection.inputStream))
+            } catch (e : Exception) {
+                Result.failure(Exception("Cannot retreive picture"))
+            }
     }
 
     fun getCurrentCounters() : Result<Stream<BikeCounterValue>> {

@@ -1,6 +1,7 @@
 package com.app.bbcounters
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.app.AppCompatActivity
@@ -9,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.View.OnTouchListener
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import java.util.concurrent.Executors
@@ -29,11 +31,16 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         val addressTextView = holder.view.findViewById<TextView>(R.id.deviceAddress)
         val dailyCounterView = holder.view.findViewById<TextView>(R.id.daylyCounter)
         val yearlyCounterView = holder.view.findViewById<TextView>(R.id.yearlyCounter)
+        val imageView = holder.view.findViewById<ImageView>(R.id.image_device)
         val na = context.resources.getString(R.string.na)
         idTextView.text = devices[position].name
         addressTextView.text = devices[position].address
         dailyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else na
         yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else na
+        if (devices[position].picture != null)
+            imageView.setImageBitmap(devices[position].picture)
+        else
+            imageView.setImageBitmap(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
         holder.view.setOnClickListener { BikeCounterActivity.startActivity(context, devices[position].name) }
         holder.view.setOnTouchListener { v, e -> swipeDetector.onTouch(v, e) }
     }
@@ -103,21 +110,32 @@ class MainActivity : AppCompatActivity() {
                 onTop = (!recyclerView.canScrollVertically(-1) && dy <= 0)
             }
         })
-        val savedData = savedInstanceState?.getParcelableArray(listDevicesParameter)
-        if (savedData == null) {
+        val data = restoreArrayOfDisplayedCounterData(savedInstanceState)
+        if (data == null)
             loadList()
-        }
         else {
-            val data : Array<DisplayedCountersData> = savedData as Array<DisplayedCountersData>
             devicesDataArray = data
             recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
         }
     }
 
+    private fun saveArrayOfDisplayedCounterData(data : Array<DisplayedCountersData>, bundle : Bundle) {
+        bundle.putParcelableArray(listDevicesParameter, data)
+        data.forEach { it.storeBitmapToFile(this) }
+    }
+
+    private fun restoreArrayOfDisplayedCounterData(bundle : Bundle?) : Array<DisplayedCountersData>? {
+        val savedData = bundle?.getParcelableArray(listDevicesParameter) ?: return null
+        val data = savedData as Array<DisplayedCountersData>
+        data.forEach { it.retrieveBitmap(this) }
+        return data
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArray(listDevicesParameter, devicesDataArray)
-    }
+        val devicesArray = devicesDataArray ?: return
+        saveArrayOfDisplayedCounterData(devicesArray, outState)
+   }
 
     private fun loadList() {
         Executors.newSingleThreadExecutor().execute {
