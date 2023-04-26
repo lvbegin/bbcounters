@@ -67,10 +67,6 @@ class DisplayedCountersData private constructor(val name : String, val address :
             return devices.map { device ->
                 val pictureFromServer = dataServer.getPictures(device)
                 val picture = pictureFromServer.getOrNull()
-                if (pictureFromServer.isFailure)
-                    Log.d("test output", "load picture from ${device.pictureURL} failed")
-                else
-                    Log.d("test output", "load picture from ${device.pictureURL} succeeded")
                 val v = currentCountersArray.find { it.name == device.name }
                 val day = v?.dayValue ?: -1
                 val year = v?.yearValue ?: -1
