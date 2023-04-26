@@ -72,8 +72,8 @@ class DisplayedCountersData private constructor(val name : String, val address :
                 else
                     Log.d("test output", "load picture from ${device.pictureURL} succeeded")
                 val v = currentCountersArray.find { it.name == device.name }
-                val day = if (v != null) v.dayValue else -1
-                val year = if (v != null) v.yearValue else -1
+                val day = v?.dayValue ?: -1
+                val year = v?.yearValue ?: -1
                 DisplayedCountersData(device.name, device.address, day, year, picture)
             }.toArray<DisplayedCountersData> { length -> arrayOfNulls<DisplayedCountersData>(length) }
         }
