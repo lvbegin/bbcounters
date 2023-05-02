@@ -39,8 +39,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
         val stream = ByteArrayOutputStream()
         picture?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         val bytes: ByteArray = stream.toByteArray()
-        val f : FileOutputStream = context.openFileOutput("$name.jpg", Context.MODE_PRIVATE);
-        f.write(bytes)
+        context.openFileOutput("$name.jpg", Context.MODE_PRIVATE).write(bytes);
     }
 
     override fun describeContents() = 0
