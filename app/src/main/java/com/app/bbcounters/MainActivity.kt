@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import java.util.concurrent.Executors
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     private var toast: Toast? = null
     private var devicesDataArray : Array<DisplayedCountersData> ?= null
     private val swipeDetector = DownSwipe()
+    private lateinit var progressBar : ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +97,8 @@ class MainActivity : AppCompatActivity() {
         }
         swipeDetector.swipeIsRelevant = { this.onTop }
 
-        recyclerView = findViewById<RecyclerView>(R.id.devicesList)
+        progressBar = findViewById(R.id.progressBarMain)
+        recyclerView = findViewById(R.id.devicesList)
         val linearLayoutManager = LinearLayoutManager(this)
         recyclerView?.layoutManager = linearLayoutManager
         val dividerItemDecoration = DividerItemDecoration(
@@ -111,8 +114,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
         val data = restoreArrayOfDisplayedCounterData(savedInstanceState)
-        if (data == null)
+        if (data == null) {
+            progressBar.visibility = View.VISIBLE
             loadList()
+        }
         else {
             devicesDataArray = data
             recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
@@ -151,6 +156,7 @@ class MainActivity : AppCompatActivity() {
                     recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
                     toast?.cancel()
                     toast = null
+                    progressBar.visibility = View.INVISIBLE
                 }
             }
         }
