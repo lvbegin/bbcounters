@@ -101,11 +101,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.devicesList)
         val linearLayoutManager = LinearLayoutManager(this)
         recyclerView?.layoutManager = linearLayoutManager
-        val dividerItemDecoration = DividerItemDecoration(
-            recyclerView?.context,
-            linearLayoutManager.orientation
-        )
-        recyclerView?.addItemDecoration(dividerItemDecoration)
         recyclerView?.setOnTouchListener { view, event -> swipeDetector.onTouch(view, event) }
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
