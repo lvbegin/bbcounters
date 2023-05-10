@@ -15,8 +15,8 @@
     <string name="year_counter_label">Months</string>
     <string name="na">n/a</string>
     <string name="loading_message">Loading..."</string>
-    <string name="this_day">This day:</string>
-    <string name="this_year">This year:</string>
+    <string name="this_day">Day</string>
+    <string name="this_year">Year</string>
 
     <string-array name="graph_type">
         <item>Bar Graph</item>

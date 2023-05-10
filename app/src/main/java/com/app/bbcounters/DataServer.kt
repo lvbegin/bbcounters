@@ -93,6 +93,7 @@ class DataServer {
                     val counters = data.getJSONObject(it)
                     BikeCounterValue(
                         it,
+                        counters.getInt("hour_cnt"),
                         counters.getInt("day_cnt"),
                         counters.getInt("year_cnt")
                     )
