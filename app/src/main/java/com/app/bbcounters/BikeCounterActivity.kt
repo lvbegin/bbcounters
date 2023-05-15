@@ -18,12 +18,8 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
-import java.time.LocalDateTime
-import java.time.Year
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.concurrent.Executors
-import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
@@ -78,6 +74,7 @@ class BikeCounterActivity : AppCompatActivity() {
             val years : ArrayList<String>? = listYears
             if (years != null)
                 YearCounterActivity.startActivity(this, id, years)
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
         swipeDetector.condition = { point1, point2 ->
             val deltaX =  point1.first - point2.first
