@@ -30,12 +30,14 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val idTextView = holder.view.findViewById<TextView>(R.id.deviceID)
         val addressTextView = holder.view.findViewById<TextView>(R.id.deviceAddress)
+        val hourCounterView = holder.view.findViewById<TextView>(R.id.hourCounter)
         val dailyCounterView = holder.view.findViewById<TextView>(R.id.daylyCounter)
         val yearlyCounterView = holder.view.findViewById<TextView>(R.id.yearlyCounter)
         val imageView = holder.view.findViewById<ImageView>(R.id.image_device)
         val na = context.resources.getString(R.string.na)
         idTextView.text = devices[position].name
         addressTextView.text = devices[position].address
+        hourCounterView?.text = if (devices[position].hourValue >=0) devices[position].hourValue.toString() else na
         dailyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else na
         yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else na
         if (devices[position].picture != null)

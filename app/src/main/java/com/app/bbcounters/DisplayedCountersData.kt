@@ -10,11 +10,13 @@ import java.io.FileOutputStream
 
 
 class DisplayedCountersData private constructor(val name : String, val address : String,
+                                                val hourValue : Int,
                                                 val dayValue : Int, val yearValue : Int,
                                                 var picture : Bitmap?) : Parcelable {
         constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
             null,
@@ -30,6 +32,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
         parcel.writeString(address)
+        parcel.writeInt(hourValue)
         parcel.writeInt(dayValue)
         parcel.writeInt(yearValue)
     }
@@ -67,9 +70,10 @@ class DisplayedCountersData private constructor(val name : String, val address :
                 val pictureFromServer = dataServer.getPictures(device)
                 val picture = pictureFromServer.getOrNull()
                 val v = currentCountersArray.find { it.name == device.name }
+                val hour = v?.hourValue ?: -1
                 val day = v?.dayValue ?: -1
                 val year = v?.yearValue ?: -1
-                DisplayedCountersData(device.name, device.address, day, year, picture)
+                DisplayedCountersData(device.name, device.address, hour, day, year, picture)
             }.toArray<DisplayedCountersData> { length -> arrayOfNulls<DisplayedCountersData>(length) }
         }
     }
