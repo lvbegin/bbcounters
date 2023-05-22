@@ -1,5 +1,6 @@
 package com.app.bbcounters
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -19,7 +20,7 @@ import kotlin.math.abs
 
 
 class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
-            private val context : Context, private val swipeDetector : OnTouchListener) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
+            private val context : Activity, private val swipeDetector : OnTouchListener) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
     class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view) { }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -44,7 +45,10 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             imageView.setImageBitmap(devices[position].picture)
         else
             imageView.setImageBitmap(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
-        holder.view.setOnClickListener { BikeCounterActivity.startActivity(context, devices[position].name) }
+        holder.view.setOnClickListener {
+            BikeCounterActivity.startActivity(context, devices[position].name)
+            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
         holder.view.setOnTouchListener { v, e -> swipeDetector.onTouch(v, e) }
     }
 

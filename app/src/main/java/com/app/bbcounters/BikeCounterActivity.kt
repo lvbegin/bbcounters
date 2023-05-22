@@ -50,6 +50,7 @@ class BikeCounterActivity : AppCompatActivity() {
     private lateinit var progressbar2 : ProgressBar
     private lateinit var progressBarText : TextView
     private lateinit var id: String
+    private var swipLeft = false
     private var firstYear = 2018
     private var thisYear  = 0
 
@@ -71,15 +72,29 @@ class BikeCounterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
         swipeDetector.action  = {
-            val years : ArrayList<String>? = listYears
-            if (years != null)
-                YearCounterActivity.startActivity(this, id, years)
+            if (swipLeft)
+            {
+                val years : ArrayList<String>? = listYears
+                if (years != null)
+                    YearCounterActivity.startActivity(this, id, years)
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+
+            }
+            else
+            {
+                finish()
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
+            }
         }
         swipeDetector.condition = { point1, point2 ->
             val deltaX =  point1.first - point2.first
             val deltaY = point1.second - point2.second
-             (deltaX > 300 && abs(deltaY) < 100)
+            if (abs(deltaX) > 300 && abs(deltaY) < 100)
+            {
+                swipLeft = (deltaX > 0)
+                true
+            }
+            else false
         }
         id = intent.extras?.getString(deviceIdParameter) ?: return
         listYears = savedInstanceState?.getStringArrayList(listYearSavedState)
@@ -173,5 +188,10 @@ class BikeCounterActivity : AppCompatActivity() {
             barchart.notifyDataSetChanged()
             barchart.invalidate()
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
     }
 }
