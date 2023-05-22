@@ -20,6 +20,7 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import kotlin.math.abs
 
 class ParcelableMap : Parcelable {
     var map : MutableMap<String, Int>
@@ -69,6 +70,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
     private lateinit var progressBar : ProgressBar
     private var currentYearIndex : Int? = null;
     private var lineGraphType = false
+    private val basicSwipe = BasicSwipe()
     companion object {
         private const val deviceIdParameter : String = "id"
         private const val yearParameter : String = "years"
@@ -84,6 +86,15 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_year_counter)
         setIcon(this)
+        basicSwipe.action  = {
+            finish()
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
+        }
+        basicSwipe.condition = { point1, point2 ->
+            val deltaX =  point2.first - point1.first
+            val deltaY = point1.second - point2.second
+            (deltaX > 300 && abs(deltaY) < 100)
+        }
         lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
         dataFromServer = savedInstanceState?.getParcelable(dataSavedState)
         id = intent.extras?.getString(deviceIdParameter) ?: return
@@ -131,9 +142,11 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         lineChart = findViewById<LineChart>(R.id.yearlyHistoryLineChart)
         lineChart?.setNoDataText(resources.getString(R.string.loading_data))
         lineChart?.setNoDataTextColor(R.color.primaryTextColor)
+        lineChart?.setOnTouchListener(basicSwipe)
         barChart = findViewById<BarChart>(R.id.yearlyHistoryBarChart)
         barChart?.setNoDataText(resources.getString(R.string.loading_data))
         barChart?.setNoDataTextColor(R.color.primaryTextColor)
+        barChart?.setOnTouchListener(basicSwipe)
         progressBar = findViewById(R.id.progressBarYearBikeCounter)
         loadDataIntoGraph(listYears[yearIndex])
     }
