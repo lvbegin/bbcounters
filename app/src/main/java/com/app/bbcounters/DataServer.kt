@@ -19,21 +19,21 @@ class DataServer {
         .authority("data.mobility.brussels")
         .path("bike/api/counts/")
         .appendQueryParameter("request", "devices")
-        .build().toString();
+        .build().toString()
 
     private val uriCurrentCounters = Uri.Builder()
         .scheme("https")
         .authority("data.mobility.brussels")
         .path("bike/api/counts/")
         .appendQueryParameter("request", "live")
-        .build().toString();
+        .build().toString()
 
     private fun getConnectionOutputString(con : HttpsURLConnection) : Result<String> {
         try {
-            con.doOutput = true;
-            con.requestMethod = "GET";
-            val input = BufferedReader(InputStreamReader(con.inputStream));
-            var rc = "";
+            con.doOutput = true
+            con.requestMethod = "GET"
+            val input = BufferedReader(InputStreamReader(con.inputStream))
+            var rc = ""
             if (con.responseMessage != "OK")
                 return Result.failure(Exception("Get request failed"))
             input.forEachLine { rc += it; }
@@ -53,9 +53,8 @@ class DataServer {
             val response = responseAsString.getOrNull() ?: return Result.failure(Exception("Cannot get devices information"))
             val features = JSONObject(response).getJSONArray("features")
             Result.success(IntStream.range(0, features.length())
-                    .mapToObj { it -> features.getJSONObject(it) }
-                    .map { it ->
-                        BikeCounterDevice(
+                    .mapToObj { features.getJSONObject(it) }
+                    .map { BikeCounterDevice(
                             it.getJSONObject("properties").getString("device_name"),
                             it.getJSONObject("properties").getString("road_fr"),
                             it.getJSONObject("properties").getString("picture_1")
@@ -71,7 +70,7 @@ class DataServer {
                 val connection = URL(device.pictureURL).openConnection() as HttpsURLConnection
                 Result.success(BitmapFactory.decodeStream(connection.inputStream))
             } catch (e : Exception) {
-                Result.failure(Exception("Cannot retreive picture"))
+                Result.failure(Exception("Cannot retrieve picture"))
             }
     }
 
@@ -116,20 +115,20 @@ class DataServer {
                 .appendQueryParameter("featureID", id)
                 .appendQueryParameter("startDate", firstDayYear)
                 .appendQueryParameter("endDate", lastDayYear)
-                .build().toString();
-            val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection;
-            val responseAsString = getConnectionOutputString(connection);
+                .build().toString()
+            val connection = URL(uriCounterHistory).openConnection() as HttpsURLConnection
+            val responseAsString = getConnectionOutputString(connection)
             if (responseAsString.isFailure)
                 return Result.failure(Exception("Cannot get yearly counter history"))
             val response = responseAsString.getOrNull()
                 ?: return Result.failure(Exception("Cannot get yearly counter history"))
-            val data = JSONObject(response).getJSONArray("data");
-            var map = mutableMapOf<String, Int>()
+            val data = JSONObject(response).getJSONArray("data")
+            val map = mutableMapOf<String, Int>()
             for (i in 0 until data.length()) {
                 val entry = data.getJSONObject(i)
                 val day = entry.get("count_date").toString()
                 val v = entry.getInt("count")
-                map.put(day, map.getOrDefault(day, 0) + v)
+                map[day] = map.getOrDefault(day, 0) + v
             }
             return Result.success(map)
         }

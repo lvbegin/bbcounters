@@ -1,12 +1,9 @@
 package com.app.bbcounters
 
 import android.app.Activity
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -21,7 +18,7 @@ import kotlin.math.abs
 
 class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             private val context : Activity, private val swipeDetector : OnTouchListener) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
-    class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view) { }
+    class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.device_layout, parent, false)
@@ -55,7 +52,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
     override fun getItemCount(): Int = devices.size
 }
 
-class DownSwipe() : OnTouchListener {
+class DownSwipe : OnTouchListener {
     private val swipeDetector = BasicSwipe()
     private var mustRegister = false
     var swipeIsRelevant : () -> Boolean = { false }
@@ -79,7 +76,6 @@ class DownSwipe() : OnTouchListener {
 class MainActivity : AppCompatActivity() {
     private val listDevicesParameter = "data"
     private var recyclerView : RecyclerView? = null
-    private lateinit var detector : GestureDetectorCompat
     private var onTop = true
     private var toast: Toast? = null
     private var devicesDataArray : Array<DisplayedCountersData> ?= null

@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
 
 
 class DisplayedCountersData private constructor(val name : String, val address : String,
@@ -20,7 +19,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
         parcel.readInt(),
         parcel.readInt(),
             null,
-    )  { }
+    )
 
     fun retrieveBitmap(context: Context)
     {
@@ -42,7 +41,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
         val stream = ByteArrayOutputStream()
         picture?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         val bytes: ByteArray = stream.toByteArray()
-        context.openFileOutput("$name.jpg", Context.MODE_PRIVATE).write(bytes);
+        context.openFileOutput("$name.jpg", Context.MODE_PRIVATE).write(bytes)
     }
 
     override fun describeContents() = 0
@@ -74,7 +73,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
                 val day = v?.dayValue ?: -1
                 val year = v?.yearValue ?: -1
                 DisplayedCountersData(device.name, device.address, hour, day, year, picture)
-            }.toArray<DisplayedCountersData> { length -> arrayOfNulls<DisplayedCountersData>(length) }
+            }.toArray { length -> arrayOfNulls<DisplayedCountersData>(length) }
         }
     }
 }

@@ -27,7 +27,7 @@ class ParcelableMap : Parcelable {
     private set
 
     constructor(parcel: Parcel)  {
-        this.map = mutableMapOf<String, Int>()
+        this.map = mutableMapOf()
         val size = parcel.readInt()
         (1..size).forEach { _ ->
             val key = parcel.readString()
@@ -68,7 +68,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
     private lateinit var yearSpinner : Spinner
     private lateinit var graphTypeSpinner : Spinner
     private lateinit var progressBar : ProgressBar
-    private var currentYearIndex : Int? = null;
+    private var currentYearIndex : Int? = null
     private var lineGraphType = false
     private val basicSwipe = BasicSwipe()
     companion object {
@@ -100,11 +100,11 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         id = intent.extras?.getString(deviceIdParameter) ?: return
         listYears = intent.getSerializableExtra(yearParameter) as ArrayList<String>
         listYears.sort()
-        val yearIndex = savedInstanceState?.getInt(currentYearSavedState) ?: listYears.size - 1
+        val yearIndex = savedInstanceState?.getInt(currentYearSavedState) ?: (listYears.size - 1)
         val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
         adapter.setDropDownViewResource(R.layout.year_item_list_layout)
         listYears.forEach {  adapter.add(it) }
-        yearSpinner = findViewById<Spinner>(R.id.list_counter_years)
+        yearSpinner = findViewById(R.id.list_counter_years)
         yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val year : String = adapter.getItem(position) ?: return
@@ -119,7 +119,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         }
         yearSpinner.adapter = adapter
         val adapterGraphType = ArrayAdapter(this, R.layout.year_graph_item_layout, resources.getStringArray(R.array.graph_type))
-        graphTypeSpinner = findViewById<Spinner>(R.id.graph_type_years)
+        graphTypeSpinner = findViewById(R.id.graph_type_years)
         adapterGraphType.setDropDownViewResource(R.layout.year_graph_item_list_layout)
         graphTypeSpinner.adapter = adapterGraphType
         graphTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -139,11 +139,11 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         }
         currentYearIndex = yearIndex
         yearSpinner.setSelection(yearIndex)
-        lineChart = findViewById<LineChart>(R.id.yearlyHistoryLineChart)
+        lineChart = findViewById(R.id.yearlyHistoryLineChart)
         lineChart?.setNoDataText(resources.getString(R.string.loading_data))
         lineChart?.setNoDataTextColor(R.color.primaryTextColor)
         lineChart?.setOnTouchListener(basicSwipe)
-        barChart = findViewById<BarChart>(R.id.yearlyHistoryBarChart)
+        barChart = findViewById(R.id.yearlyHistoryBarChart)
         barChart?.setNoDataText(resources.getString(R.string.loading_data))
         barChart?.setNoDataTextColor(R.color.primaryTextColor)
         barChart?.setOnTouchListener(basicSwipe)
@@ -168,7 +168,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         else
             loadDataIntoBarGraph(year)
     }
-    fun loadDataIntoLineGraph(year : String) {
+    private fun loadDataIntoLineGraph(year : String) {
         barChart?.visibility = View.INVISIBLE
         lineChart?.visibility = View.INVISIBLE
         progressBar.visibility = View.VISIBLE
@@ -177,7 +177,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
-                var data = DataServer().getCounterHistoryYear(id, year)
+                val data = DataServer().getCounterHistoryYear(id, year)
                 data.onFailure {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
@@ -186,8 +186,8 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                     dataFromServer = ParcelableMap(it)
                 }
             }
-            var data = dataFromServer?.map ?: return@execute
-            var keys = data.keys.toTypedArray()
+            val data = dataFromServer?.map ?: return@execute
+            val keys = data.keys.toTypedArray()
 
             val entriesLine = IntStream.range(0, data.keys.size).mapToObj { i ->
                 Entry(
@@ -196,7 +196,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                 )
             }.collect(Collectors.toList())
             val dayValues = entriesLine as List<Entry>
-            var lineDataSet = LineDataSet(dayValues, getString(R.string.graph_year_counter_label))
+            val lineDataSet = LineDataSet(dayValues, getString(R.string.graph_year_counter_label))
             lineDataSet.setDrawValues(false)
             lineDataSet.color = Color.BLUE
             lineDataSet.circleColors = MutableList(1) { Color.BLUE }
@@ -209,7 +209,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
             lineChart?.axisRight?.setDrawGridLines(false)
             lineChart?.axisRight?.textSize = 12f
 
-            var lineData = LineData(lineDataSet)
+            val lineData = LineData(lineDataSet)
 
             runOnUiThread {
                 lineChart?.visibility = View.VISIBLE
@@ -224,7 +224,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
 
         }
     }
-    fun loadDataIntoBarGraph(year : String) {
+    private fun loadDataIntoBarGraph(year : String) {
         barChart?.visibility = View.INVISIBLE
         lineChart?.visibility = View.INVISIBLE
         progressBar.visibility = View.VISIBLE
@@ -233,7 +233,7 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
         graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
             if (dataFromServer == null) {
-                var data = DataServer().getCounterHistoryYear(id, year)
+                val data = DataServer().getCounterHistoryYear(id, year)
                 data.onFailure {
                     askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
                     return@execute
@@ -242,32 +242,32 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
                     dataFromServer = ParcelableMap(it)
                 }
             }
-            var data = dataFromServer?.map ?: return@execute
-            var keys = data.keys.toTypedArray()
+            val data = dataFromServer?.map ?: return@execute
+            val keys = data.keys.toTypedArray()
 
             val entriesBar = IntStream.range(0, data.keys.size).mapToObj { i ->
-                Pair<Float, Int>(
+                Pair(
                     keys[i].subSequence(5, 7).toString().toFloat(),
-                    data[keys[i]]?.toInt() ?: 0
+                    data[keys[i]] ?: 0
                 )
             }.collect(Collectors.toList())
-            var monthMap = mutableMapOf<Float, Int>()
+            val monthMap = mutableMapOf<Float, Int>()
             val entriesBarList = entriesBar ?: return@execute
             entriesBarList.forEach {
                 monthMap[it.first] = monthMap.getOrDefault(it.first, 0) + it.second
             }
             val monthValues = monthMap.keys.stream().map { month ->
-                val value: Float = monthMap.get(month)!!.toFloat()
+                val value: Float = monthMap[month]!!.toFloat()
                 ParcelableBarEntry(month, value)
             }.collect(Collectors.toList())
-            var values = monthValues as List<BarEntry>
+            val values = monthValues as List<BarEntry>
             val barDataSet = BarDataSet(values, getString(R.string.year_counter_label))
             val barData = BarData(barDataSet)
             barDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
             barDataSet.valueTextColor = Color.BLACK
             barDataSet.valueTextSize = 15f
             barChart?.xAxis?.valueFormatter = IAxisValueFormatter { value, _ ->
-                val xAxis = arrayListOf<String>("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
+                val xAxis = arrayListOf("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
                 val intValue = value.toInt()
                 if (intValue.toFloat().equals(value)) xAxis[intValue - 1] else ""
             }

@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v4.view.GestureDetectorCompat
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -24,7 +23,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
-    constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat()) { }
+    constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         super.writeToParcel(parcel, flags)
@@ -45,12 +44,11 @@ class BikeCounterActivity : AppCompatActivity() {
     private val listYearSavedState = "years"
     private val graphValuesSavedState = "values"
     private lateinit var barchart : BarChart
-    private lateinit var detector : GestureDetectorCompat
     private lateinit var progressbar : ProgressBar
     private lateinit var progressbar2 : ProgressBar
     private lateinit var progressBarText : TextView
     private lateinit var id: String
-    private var swipLeft = false
+    private var swipeLeft = false
     private var firstYear = 2018
     private var thisYear  = 0
 
@@ -72,7 +70,7 @@ class BikeCounterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
         swipeDetector.action  = {
-            if (swipLeft)
+            if (swipeLeft)
             {
                 val years : ArrayList<String>? = listYears
                 if (years != null)
@@ -91,7 +89,7 @@ class BikeCounterActivity : AppCompatActivity() {
             val deltaY = point1.second - point2.second
             if (abs(deltaX) > 300 && abs(deltaY) < 100)
             {
-                swipLeft = (deltaX > 0)
+                swipeLeft = (deltaX > 0)
                 true
             }
             else false
@@ -128,14 +126,14 @@ class BikeCounterActivity : AppCompatActivity() {
         Executors.newSingleThreadExecutor().execute {
             if (listYears == null || yearValues == null)
             {
-                var years = ArrayList<String>()
-                var values = mutableListOf<ParcelableBarEntry>()
+                val years = ArrayList<String>()
+                val values = mutableListOf<ParcelableBarEntry>()
                 listYears = years
                 yearValues = values
                 for (i in firstYear..thisYear)
                 {
                     runOnUiThread {
-                        progressBarText.text = "Loadind data for ${i.toString()}"
+                        progressBarText.text = getString(R.string.loading_all_year_data, i.toString())
                     }
                     val data = DataServer().getCounterHistoryYear(id, i.toString())
                     data.onFailure {
@@ -148,7 +146,7 @@ class BikeCounterActivity : AppCompatActivity() {
                         {
                             values.add(ParcelableBarEntry(i.toFloat(), value.toFloat()))
                             years.add(i.toString())
-                            Log.v("test output", "${values.toString()}")
+                            Log.v("test output", values.toString())
                         }
                         runOnUiThread {
                             progressbar.progress++

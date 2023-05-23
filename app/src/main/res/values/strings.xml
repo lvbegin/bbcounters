@@ -17,6 +17,7 @@
     <string name="loading_message">Loading..."</string>
     <string name="this_day">Day</string>
     <string name="this_year">Year</string>
+    <string name="loading_all_year_data">Loading data for %1$s</string>
 
     <string-array name="graph_type">
         <item>Bar Graph</item>
