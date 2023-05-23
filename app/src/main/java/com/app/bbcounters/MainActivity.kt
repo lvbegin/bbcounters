@@ -29,7 +29,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         val idTextView = holder.view.findViewById<TextView>(R.id.deviceID)
         val addressTextView = holder.view.findViewById<TextView>(R.id.deviceAddress)
         val hourCounterView = holder.view.findViewById<TextView>(R.id.hourCounter)
-        val dailyCounterView = holder.view.findViewById<TextView>(R.id.daylyCounter)
+        val dailyCounterView = holder.view.findViewById<TextView>(R.id.dailyCounter)
         val yearlyCounterView = holder.view.findViewById<TextView>(R.id.yearlyCounter)
         val imageView = holder.view.findViewById<ImageView>(R.id.image_device)
         val na = context.resources.getString(R.string.na)
