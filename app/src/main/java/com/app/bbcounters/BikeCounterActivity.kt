@@ -87,7 +87,7 @@ class BikeCounterActivity : AppCompatActivity() {
         swipeDetector.condition = { point1, point2 ->
             val deltaX =  point1.first - point2.first
             val deltaY = point1.second - point2.second
-            if (abs(deltaX) > 300 && abs(deltaY) < 100)
+            if (abs(deltaX) > 300 && abs(deltaY) < 200)
             {
                 swipeLeft = (deltaX > 0)
                 true
