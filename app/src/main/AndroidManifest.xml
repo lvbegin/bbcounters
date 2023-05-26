@@ -14,9 +14,9 @@
         android:debuggable="false"
         android:theme="@style/Theme.BbCounters"
         tools:ignore="HardcodedDebugMode">
-        <activity android:name=".YearCounterActivity" />
-        <activity android:name=".BikeCounterActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".YearCounterActivity" android:exported="false"/>
+        <activity android:name=".BikeCounterActivity" android:exported="false"/>
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
