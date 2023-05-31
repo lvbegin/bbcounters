@@ -20,12 +20,11 @@
 
         <ImageView
             android:id="@+id/image_device"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:contentDescription="@string/counter_picture_description">
 
         </ImageView>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,16 +35,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@color/primaryColor">
-
-                <TextView
-                    android:id="@+id/deviceID"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="2pt"
-                    android:fontFamily="monospace"
-                    android:freezesText="false"
-                    android:textSize="10sp"
-                    android:textColor="@color/BrusselsYellowColor"/>
 
                 <TextView
                     android:id="@+id/deviceAddress"
