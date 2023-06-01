@@ -40,9 +40,10 @@
                     android:id="@+id/deviceAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@color/BrusselsYellowColor"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/BrusselsYellowColor"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout

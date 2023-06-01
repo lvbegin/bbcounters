@@ -41,11 +41,11 @@
                     android:id="@+id/deviceID"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="2pt"
+                    android:layout_marginLeft="5dp"
                     android:fontFamily="monospace"
                     android:freezesText="false"
-                    android:textSize="10sp"
-                    android:textColor="@color/BrusselsYellowColor"/>
+                    android:textColor="@color/BrusselsYellowColor"
+                    android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/deviceAddress"
