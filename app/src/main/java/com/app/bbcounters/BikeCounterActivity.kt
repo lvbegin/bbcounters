@@ -130,8 +130,7 @@ class BikeCounterActivity : AppCompatActivity() {
                 val values = mutableListOf<ParcelableBarEntry>()
                 listYears = years
                 yearValues = values
-                for (i in firstYear..thisYear)
-                {
+                (firstYear..thisYear).forEach() { i ->
                     runOnUiThread {
                         progressBarText.text = getString(R.string.loading_all_year_data, i.toString())
                     }

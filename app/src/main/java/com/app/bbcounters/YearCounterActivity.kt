@@ -40,10 +40,13 @@ class ParcelableMap : Parcelable {
     constructor(map : MutableMap<String, Int>) { this.map = map }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(this.map.size)
-        for (key in map.keys) {
-            parcel.writeString(key)
-            parcel.writeInt(map[key]!!)
+        parcel.writeInt(map.size)
+        map.keys.forEach { it
+            val value = map[it]
+            if (value != null) {
+                parcel.writeString(it)
+                parcel.writeInt(value)
+            }
         }
     }
 
@@ -190,10 +193,8 @@ class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
             val keys = data.keys.toTypedArray()
 
             val entriesLine = IntStream.range(0, data.keys.size).mapToObj { i ->
-                Entry(
-                    i.toFloat(),
-                    data[keys[i]]?.toFloat() ?: 0f
-                )
+                Entry(i.toFloat(),
+                    data[keys[i]]?.toFloat() ?: 0f)
             }.collect(Collectors.toList())
             val dayValues = entriesLine as List<Entry>
             val lineDataSet = LineDataSet(dayValues, getString(R.string.graph_year_counter_label))

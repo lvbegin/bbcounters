@@ -124,8 +124,8 @@ class DataServer {
                 ?: return Result.failure(Exception("Cannot get yearly counter history"))
             val data = JSONObject(response).getJSONArray("data")
             val map = mutableMapOf<String, Int>()
-            for (i in 0 until data.length()) {
-                val entry = data.getJSONObject(i)
+             (0 until data.length()).forEach() {
+                val entry = data.getJSONObject(it)
                 val day = entry.get("count_date").toString()
                 val v = entry.getInt("count")
                 map[day] = map.getOrDefault(day, 0) + v
