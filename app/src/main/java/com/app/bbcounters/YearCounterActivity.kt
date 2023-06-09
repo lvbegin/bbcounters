@@ -41,7 +41,7 @@ class ParcelableMap : Parcelable {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(map.size)
-        map.keys.forEach { it
+        map.keys.forEach {
             val value = map[it]
             if (value != null) {
                 parcel.writeString(it)
