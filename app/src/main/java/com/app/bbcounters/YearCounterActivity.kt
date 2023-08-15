@@ -59,7 +59,7 @@ class ParcelableMap : Parcelable {
     }
 }
 
-class YearCounterActivity : android.support.v7.app.AppCompatActivity() {
+class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     private val currentYearSavedState : String = "current"
     private val dataSavedState : String = "data"
     private val lineGraphTypeSavedState : String = "lineGraphType"

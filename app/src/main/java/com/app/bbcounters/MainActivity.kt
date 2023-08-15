@@ -3,9 +3,9 @@ package com.app.bbcounters
 import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.ImageView
@@ -102,7 +102,8 @@ class MainActivity : AppCompatActivity() {
 
         progressBar = findViewById(R.id.progressBarMain)
         recyclerView = findViewById(R.id.devicesList)
-        val linearLayoutManager = LinearLayoutManager(this)
+        val linearLayoutManager =
+            LinearLayoutManager(this)
         recyclerView?.layoutManager = linearLayoutManager
         recyclerView?.setOnTouchListener { view, event -> swipeDetector.onTouch(view, event) }
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {

@@ -1,6 +1,6 @@
 package com.app.bbcounters
 
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import android.util.Log
 
 import org.junit.Test

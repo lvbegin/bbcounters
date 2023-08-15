@@ -1,6 +1,6 @@
 package com.app.bbcounters
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 
 fun setIcon(activity : AppCompatActivity) {
     val actionBar = activity.supportActionBar
