@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.app.bbcounters"
-        minSdkVersion 24
-        targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 33
+        targetSdkVersion 33
+        versionCode 3
+        versionName "1.1"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
