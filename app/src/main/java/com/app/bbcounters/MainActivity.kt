@@ -39,7 +39,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         if (devices[position].picture != null)
             imageView.setImageBitmap(devices[position].picture)
         else
-            imageView.setImageBitmap(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
+            imageView.setImageResource(R.drawable.ic_launcher_foreground)
         holder.view.setOnClickListener {
             BikeCounterActivity.startActivity(context, devices[position].name)
             context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
