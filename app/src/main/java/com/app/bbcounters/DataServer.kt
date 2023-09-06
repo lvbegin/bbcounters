@@ -67,6 +67,8 @@ class DataServer {
 
     fun getPictures(device : BikeCounterDevice) : Result<Bitmap> {
             return try {
+                if (device.pictureURL == null)
+                    return Result.failure(Exception("No URL for the picture"))
                 val connection = URL(device.pictureURL).openConnection() as HttpsURLConnection
                 Result.success(BitmapFactory.decodeStream(connection.inputStream))
             } catch (e : Exception) {

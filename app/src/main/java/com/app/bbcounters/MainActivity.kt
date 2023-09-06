@@ -3,6 +3,7 @@ package com.app.bbcounters
 import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.room.Room
 import java.util.concurrent.Executors
 import kotlin.math.abs
 
@@ -81,12 +83,15 @@ class MainActivity : AppCompatActivity() {
     private var toast: Toast? = null
     private var devicesDataArray : Array<DisplayedCountersData> ?= null
     private val swipeDetector = DownSwipe()
+    private val dataServer = DataServer()
     private lateinit var progressBar : ProgressBar
+    private lateinit var deviceStore : DeviceStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setIcon(this)
+        deviceStore = DeviceStore(this, dataServer)
         swipeDetector.action = {
             toast = Toast.makeText(this, R.string.loading_message, Toast.LENGTH_SHORT)
             toast?.show()
@@ -143,19 +148,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadList() {
         Executors.newSingleThreadExecutor().execute {
-            devicesDataArray = DisplayedCountersData.get()
+            devicesDataArray = DisplayedCountersData.get(deviceStore, dataServer)
             runOnUiThread {
                 val isEmpty = devicesDataArray?.isEmpty() ?: return@runOnUiThread
-                if (isEmpty)
-                {
+                if (isEmpty) {
                     askIfRetry(this) { this@MainActivity.loadList() }
-                }
-                else {
+                } else {
                     val data = devicesDataArray ?: return@runOnUiThread
                     recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
                     toast?.cancel()
                     toast = null
                     progressBar.visibility = View.INVISIBLE
+                }
+            }
+            Log.d("test output", "start populating pictures")
+            val array = devicesDataArray ?: return@execute
+            for (i in array.indices) {
+                val pictureURL = array[i].pictureURL ?: continue
+                val counterDevice = BikeCounterDevice(array[i].name, array[i].address, pictureURL)
+                val picture = deviceStore.updateImages(counterDevice) ?: continue
+                runOnUiThread {
+                    array[i].picture = picture
+                    recyclerView?.adapter?.notifyItemChanged(i)
                 }
             }
         }

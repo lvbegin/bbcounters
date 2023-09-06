@@ -1,16 +1,22 @@
 package com.app.bbcounters
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.Exception
+import kotlin.contracts.contract
 
 
 class DisplayedCountersData private constructor(val name : String, val address : String,
                                                 val hourValue : Int,
                                                 val dayValue : Int, val yearValue : Int,
+                                                val pictureURL : String?,
                                                 var picture : Bitmap?) : Parcelable {
         constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -18,7 +24,8 @@ class DisplayedCountersData private constructor(val name : String, val address :
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
-            null,
+        parcel.readString(),
+        null,
     )
 
     fun retrieveBitmap(context: Context)
@@ -34,6 +41,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
         parcel.writeInt(hourValue)
         parcel.writeInt(dayValue)
         parcel.writeInt(yearValue)
+        parcel.writeString(pictureURL)
     }
 
     fun storeBitmapToFile(context: Context)
@@ -47,12 +55,12 @@ class DisplayedCountersData private constructor(val name : String, val address :
     override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<DisplayedCountersData> {
+
         override fun createFromParcel(parcel: Parcel) = DisplayedCountersData(parcel)
 
         override fun newArray(size: Int): Array<DisplayedCountersData?> = arrayOfNulls(size)
 
-        fun get() : Array<DisplayedCountersData>  {
-            val dataServer = DataServer()
+        fun get(deviceStore : DeviceStore, dataServer : DataServer) : Array<DisplayedCountersData>  {
             val devicesFromServer = dataServer.getDevices()
             if (devicesFromServer.isFailure)
                 return emptyArray()
@@ -66,13 +74,12 @@ class DisplayedCountersData private constructor(val name : String, val address :
             val currentCountersArray = currentCounters.toArray<BikeCounterValue> { length -> arrayOfNulls<BikeCounterValue>(length) }
 
             return devices.map { device ->
-                val pictureFromServer = dataServer.getPictures(device)
-                val picture = pictureFromServer.getOrNull()
+                val picture = deviceStore.get(device)
                 val v = currentCountersArray.find { it.name == device.name }
                 val hour = v?.hourValue ?: -1
                 val day = v?.dayValue ?: -1
                 val year = v?.yearValue ?: -1
-                DisplayedCountersData(device.name, device.address, hour, day, year, picture)
+                DisplayedCountersData(device.name, device.address, hour, day, year, device.pictureURL, picture)
             }.toArray { length -> arrayOfNulls<DisplayedCountersData>(length) }
         }
     }
