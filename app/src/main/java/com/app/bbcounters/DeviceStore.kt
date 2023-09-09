@@ -17,6 +17,8 @@ class DeviceStore(private val context : Context, private val dataServer : DataSe
             (deviceE.pictureFileName == null) ||
             ((deviceE.uploadTime + timeToReloadImageInSec) <  (Date().time / 1000))
 
+    private fun filename(deviceName : String) = "$deviceName.jpg"
+
     fun updateImages(device : BikeCounterDevice) : Bitmap? {
         try {
             val deviceE = db.get().get(device.name)
@@ -24,9 +26,9 @@ class DeviceStore(private val context : Context, private val dataServer : DataSe
                 return null
             val pictureFromServer = dataServer.getPictures(device)
             val picture = pictureFromServer.getOrNull() ?: return null
-            val filename = device.name + ".png"
+            val filename = filename(device.name)
             val file = File(context.filesDir, filename)
-            picture.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(file))
+            picture.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
             val now = Date()
             val newDeviceE = DeviceE(device.name, filename, now.time / 1000)
             try {
@@ -45,7 +47,7 @@ class DeviceStore(private val context : Context, private val dataServer : DataSe
         val deviceE = db.get().get(device.name)
         if (!pictureMustBeReloaded(deviceE)) {
             Log.d("test output", "image stored")
-            val filename = File(context.filesDir, device.name + ".png").toString()
+            val filename = File(context.filesDir, filename(device.name)).toString()
             picture = BitmapFactory.decodeFile(filename)
         }
         return picture

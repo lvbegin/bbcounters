@@ -28,11 +28,10 @@ class DisplayedCountersData private constructor(val name : String, val address :
         null,
     )
 
-    fun retrieveBitmap(context: Context)
+    fun retrieveBitmap(context: Context, deviceStore : DeviceStore)
     {
-        val bytes = context.openFileInput("$name.jpg").readBytes()
-        if (bytes.isNotEmpty())
-            picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        val pictureURL = this.pictureURL ?: return
+        picture = deviceStore.get(BikeCounterDevice(name, address, pictureURL))
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -42,14 +41,6 @@ class DisplayedCountersData private constructor(val name : String, val address :
         parcel.writeInt(dayValue)
         parcel.writeInt(yearValue)
         parcel.writeString(pictureURL)
-    }
-
-    fun storeBitmapToFile(context: Context)
-    {
-        val stream = ByteArrayOutputStream()
-        picture?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-        val bytes: ByteArray = stream.toByteArray()
-        context.openFileOutput("$name.jpg", Context.MODE_PRIVATE).write(bytes)
     }
 
     override fun describeContents() = 0

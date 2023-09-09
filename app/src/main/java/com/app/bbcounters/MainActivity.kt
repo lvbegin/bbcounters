@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.room.Room
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.math.abs
 
@@ -130,13 +131,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveArrayOfDisplayedCounterData(data : Array<DisplayedCountersData>, bundle : Bundle) {
         bundle.putParcelableArray(listDevicesParameter, data)
-        data.forEach { it.storeBitmapToFile(this) }
     }
 
     private fun restoreArrayOfDisplayedCounterData(bundle : Bundle?) : Array<DisplayedCountersData>? {
         val savedData = bundle?.getParcelableArray(listDevicesParameter) ?: return null
         val data = savedData as Array<DisplayedCountersData>
-        data.forEach { it.retrieveBitmap(this) }
+        val countDownLatch = CountDownLatch(1)
+        Executors.newSingleThreadExecutor().execute {
+            data.forEach { it.retrieveBitmap(this, deviceStore) }
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
         return data
     }
 
