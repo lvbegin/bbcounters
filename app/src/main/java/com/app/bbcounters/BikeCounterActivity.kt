@@ -21,6 +21,7 @@ import java.util.Calendar
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 import kotlin.math.abs
+import androidx.activity.OnBackPressedCallback
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
     constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat())
@@ -69,6 +70,12 @@ class BikeCounterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
+            }
+        })
         swipeDetector.action  = {
             if (swipeLeft)
             {
@@ -105,7 +112,7 @@ class BikeCounterActivity : AppCompatActivity() {
         barchart.setNoDataTextColor(R.color.primaryTextColor)
         barchart.setOnTouchListener(swipeDetector)
         barchart.visibility = View.INVISIBLE
-        val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState)
+        val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState, ParcelableBarEntry::class.java)
         yearValues = values?.toList()
         loadDataIntoGraph()
     }
@@ -185,10 +192,5 @@ class BikeCounterActivity : AppCompatActivity() {
             barchart.notifyDataSetChanged()
             barchart.invalidate()
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
     }
 }

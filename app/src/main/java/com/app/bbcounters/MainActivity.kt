@@ -134,15 +134,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun restoreArrayOfDisplayedCounterData(bundle : Bundle?) : Array<DisplayedCountersData>? {
-        val savedData = bundle?.getParcelableArray(listDevicesParameter) ?: return null
-        val data = savedData as Array<DisplayedCountersData>
+        val savedData = bundle?.getParcelableArray(listDevicesParameter,
+                            DisplayedCountersData::class.java) ?: return null
         val countDownLatch = CountDownLatch(1)
         Executors.newSingleThreadExecutor().execute {
-            data.forEach { it.retrieveBitmap(this, deviceStore) }
+            savedData.forEach { it.retrieveBitmap(deviceStore) }
             countDownLatch.countDown()
         }
         countDownLatch.await()
-        return data
+        return savedData
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

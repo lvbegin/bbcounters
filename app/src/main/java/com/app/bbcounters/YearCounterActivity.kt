@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ProgressBar
 import android.widget.Spinner
+import androidx.activity.OnBackPressedCallback
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -98,10 +99,16 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             val deltaY = point1.second - point2.second
             (deltaX > 300 && abs(deltaY) < 100)
         }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
+            }
+        })
         lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
-        dataFromServer = savedInstanceState?.getParcelable(dataSavedState)
+        dataFromServer = savedInstanceState?.getParcelable(dataSavedState, ParcelableMap::class.java)
         id = intent.extras?.getString(deviceIdParameter) ?: return
-        listYears = intent.getSerializableExtra(yearParameter) as ArrayList<String>
+        listYears = intent.getSerializableExtra(yearParameter, ArrayList::class.java) as ArrayList<String>
         listYears.sort()
         val yearIndex = savedInstanceState?.getInt(currentYearSavedState) ?: (listYears.size - 1)
         val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
@@ -292,10 +299,5 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 barChart?.invalidate()
             }
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
     }
 }

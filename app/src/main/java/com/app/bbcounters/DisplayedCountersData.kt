@@ -28,7 +28,7 @@ class DisplayedCountersData private constructor(val name : String, val address :
         null,
     )
 
-    fun retrieveBitmap(context: Context, deviceStore : DeviceStore)
+    fun retrieveBitmap(deviceStore : DeviceStore)
     {
         val pictureURL = this.pictureURL ?: return
         picture = deviceStore.get(BikeCounterDevice(name, address, pictureURL))
