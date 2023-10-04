@@ -1,9 +1,7 @@
 package com.app.bbcounters
 
 import android.app.Activity
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.provider.ContactsContract.Data
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +11,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.room.Room
+import java.util.Arrays
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -43,6 +41,17 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             imageView.setImageBitmap(devices[position].picture)
         else
             imageView.setImageResource(R.drawable.ic_launcher_foreground)
+        imageView.setOnClickListener { it ->
+            val coordinates = IntArray(2)
+            it.getLocationOnScreen(coordinates)
+            val devicesWIthPicture = Arrays.stream(devices).filter {device -> device.picture != null }
+                                        .toArray { size -> arrayOfNulls<DisplayedCountersData>(size) }
+                                        as Array<DisplayedCountersData>
+            val positionWithPicture = devicesWIthPicture.indexOfFirst {
+                device -> device?.name == devices[position].name
+            }
+            PictureActivity.startActivity(context, devicesWIthPicture, positionWithPicture, coordinates[0].toFloat(), coordinates[1].toFloat())
+        }
         holder.view.setOnClickListener {
             BikeCounterActivity.startActivity(context, devices[position].name)
             context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)

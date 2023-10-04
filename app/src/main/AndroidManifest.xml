@@ -6,16 +6,25 @@
 
     <application
         android:allowBackup="true"
+        android:debuggable="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:debuggable="false"
         android:theme="@style/Theme.BbCounters"
         tools:ignore="HardcodedDebugMode">
-        <activity android:name=".YearCounterActivity" android:exported="false"/>
-        <activity android:name=".BikeCounterActivity" android:exported="false"/>
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity
+            android:name=".PictureActivity"
+            android:exported="false" />
+        <activity
+            android:name=".YearCounterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BikeCounterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
