@@ -191,8 +191,7 @@ class BikeCounterActivity : AppCompatActivity() {
             progressBarText.visibility = View.INVISIBLE
             barchart.visibility = View.VISIBLE
             barchart.data = barData
-            barchart.notifyDataSetChanged()
-            barchart.invalidate()
+            barchart.redraw()
         }
     }
 }

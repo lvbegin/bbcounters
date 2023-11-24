@@ -296,8 +296,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 barChart?.data = barData
                 yearSpinner.isEnabled = true
                 graphTypeSpinner.isEnabled = true
-                barChart?.notifyDataSetChanged()
-                barChart?.invalidate()
+                barChart?.redraw()
             }
         }
     }

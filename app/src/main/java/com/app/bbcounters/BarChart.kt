@@ -6,3 +6,8 @@ fun BarChart.setProportional() {
     this.axisRight.axisMinimum = 0f
     this.axisLeft.axisMinimum = 0f
 }
+
+fun BarChart.redraw() {
+    this.notifyDataSetChanged()
+    this.invalidate()
+}
