@@ -111,11 +111,13 @@ class BikeCounterActivity : AppCompatActivity() {
         barchart.setNoDataText(resources.getString(R.string.loading_data))
         barchart.setNoDataTextColor(R.color.primaryTextColor)
         barchart.setOnTouchListener(swipeDetector)
+        barchart.setProportional()
         barchart.visibility = View.INVISIBLE
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState, ParcelableBarEntry::class.java)
         yearValues = values?.toList()
         loadDataIntoGraph()
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

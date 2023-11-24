@@ -288,6 +288,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             barChart?.axisLeft?.setDrawLabels(false)
             barChart?.axisLeft?.setDrawGridLines(false)
             barChart?.axisRight?.setDrawGridLines(false)
+            barChart?.setProportional()
             runOnUiThread {
                 barChart?.visibility = View.VISIBLE
                 lineChart?.visibility = View.INVISIBLE
