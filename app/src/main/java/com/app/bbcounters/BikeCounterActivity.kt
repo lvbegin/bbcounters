@@ -177,14 +177,7 @@ class BikeCounterActivity : AppCompatActivity() {
             val intValue = value.toInt()
             if (intValue.toFloat().equals(value)) intValue.toString() else ""
         }
-        barchart.xAxis.granularity = 1f
-        barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        barchart.xAxis.textSize = 12f
-        barchart.xAxis.setDrawGridLines(false)
-        barchart.axisRight.setDrawLabels(false)
-        barchart.axisLeft.setDrawLabels(false)
-        barchart.axisLeft.setDrawGridLines(false)
-        barchart.axisRight.setDrawGridLines(false)
+        barchart.configure()
         runOnUiThread {
             progressbar.visibility = View.INVISIBLE
             progressbar2.visibility = View.INVISIBLE

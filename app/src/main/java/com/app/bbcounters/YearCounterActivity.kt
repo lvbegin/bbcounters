@@ -280,14 +280,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 if (intValue.toFloat().equals(value)) xAxis[intValue - 1] else ""
             }
             barChart?.description = null
-            barChart?.xAxis?.granularity = 1f
-            barChart?.xAxis?.position = XAxis.XAxisPosition.BOTTOM
-            barChart?.xAxis?.textSize = 12f
-            barChart?.xAxis?.setDrawGridLines(false)
-            barChart?.axisRight?.setDrawLabels(false)
-            barChart?.axisLeft?.setDrawLabels(false)
-            barChart?.axisLeft?.setDrawGridLines(false)
-            barChart?.axisRight?.setDrawGridLines(false)
+            barChart?.configure()
             barChart?.setProportional()
             runOnUiThread {
                 barChart?.visibility = View.VISIBLE
