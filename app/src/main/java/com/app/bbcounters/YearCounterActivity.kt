@@ -208,14 +208,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             lineDataSet.setDrawValues(false)
             lineDataSet.color = Color.BLUE
             lineDataSet.circleColors = MutableList(1) { Color.BLUE }
-            lineChart?.xAxis?.position = XAxis.XAxisPosition.BOTTOM
-
-            lineChart?.xAxis?.setDrawGridLines(false)
-            lineChart?.xAxis?.setDrawLabels(false)
-            lineChart?.axisLeft?.setDrawLabels(false)
-            lineChart?.axisLeft?.setDrawGridLines(false)
-            lineChart?.axisRight?.setDrawGridLines(false)
-            lineChart?.axisRight?.textSize = 12f
+            lineChart?.configure()
 
             val lineData = LineData(lineDataSet)
 
@@ -226,8 +219,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 lineChart?.data = lineData
                 yearSpinner.isEnabled = true
                 graphTypeSpinner.isEnabled = true
-                lineChart?.notifyDataSetChanged()
-                lineChart?.invalidate()
+                lineChart?.redraw()
             }
 
         }
