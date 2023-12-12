@@ -37,11 +37,14 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         hourCounterView?.text = if (devices[position].hourValue >=0) devices[position].hourValue.toString() else na
         dailyCounterView.text = if (devices[position].dayValue >=0) devices[position].dayValue.toString() else na
         yearlyCounterView.text = if (devices[position].yearValue >= 0) devices[position].yearValue.toString() else na
-        if (devices[position].picture != null)
+        val pictureAvailable = devices[position].picture != null
+        if (pictureAvailable)
             imageView.setImageBitmap(devices[position].picture)
         else
             imageView.setImageResource(R.drawable.ic_launcher_foreground)
         imageView.setOnClickListener { it ->
+            if (!pictureAvailable)
+                return@setOnClickListener
             val coordinates = IntArray(2)
             it.getLocationOnScreen(coordinates)
             val devicesWIthPicture = Arrays.stream(devices).filter {device -> device.picture != null }
