@@ -1,6 +1,7 @@
 package com.app.bbcounters
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,8 +13,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import java.util.Arrays
+import java.util.Calendar
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.stream.IntStream
 import kotlin.math.abs
 
 
@@ -24,6 +27,22 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.device_layout, parent, false)
         return DeviceViewHolder(view)
+    }
+
+    private  fun yearOfActivityOfCounter(name : String) : ArrayList<String>  {
+        val thisYear  = Calendar.getInstance().get(Calendar.YEAR)
+        val server = DataServer()
+        val firstYear = IntStream.range(DataServer.firstYear, thisYear + 1).filter {
+                i ->
+            i == thisYear ||
+                    server.CounterExisted(
+                        name,
+                        i.toString()
+                    )
+        }.findFirst().asInt
+        return IntStream.range(firstYear, 2024).mapToObj { i -> i.toString() }
+            .toArray()
+            .toCollection(ArrayList()) as ArrayList<String>
     }
 
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
@@ -55,9 +74,35 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             }
             PictureActivity.startActivity(context, devicesWIthPicture, positionWithPicture, coordinates[0].toFloat(), coordinates[1].toFloat())
         }
+        
         holder.view.setOnClickListener {
             BikeCounterActivity.startActivity(context, devices[position].name)
             context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
+        holder.view.setOnLongClickListener {
+            val a = arrayOf("History", "Year")
+            val builder = AlertDialog.Builder(context, R.style.dialog_with_rounded_corner)
+                .setItems(a) { _, which ->
+                    when (which) {
+                        0 -> {
+                            BikeCounterActivity.startActivity(context, devices[position].name)
+                            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                        }
+                        1-> {
+                            YearCounterActivity.startActivity(context, devices[position].name)
+                            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                        }
+                        else -> Log.e("test output", "Unknown choice selected")
+                    }
+                }
+            val dialog = builder.create()
+            dialog.window?.attributes?.gravity = Gravity.TOP
+            dialog.window?.attributes?.x = it.x.toInt()
+            dialog.window?.attributes?.y = it.y.toInt()
+
+            dialog.show()
+            dialog.window?.setLayout(500, 400)
+            true
         }
         holder.view.setOnTouchListener { v, e -> swipeDetector.onTouch(v, e) }
     }

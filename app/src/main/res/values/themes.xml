@@ -12,6 +12,10 @@
 
     </style>
 
+    <style name="dialog_with_rounded_corner" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_rounded</item>
+    </style>
+
     <style name="Theme.BbCounters.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

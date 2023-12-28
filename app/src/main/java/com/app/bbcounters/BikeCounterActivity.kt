@@ -22,6 +22,7 @@ import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 import androidx.activity.OnBackPressedCallback
+import java.util.stream.IntStream
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
     constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat())
@@ -79,11 +80,8 @@ class BikeCounterActivity : AppCompatActivity() {
         swipeDetector.action  = {
             if (swipeLeft)
             {
-                val years : ArrayList<String>? = listYears
-                if (years != null)
-                    YearCounterActivity.startActivity(this, id, years)
+                YearCounterActivity.startActivity(this, id)
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-
             }
             else
             {
@@ -112,12 +110,11 @@ class BikeCounterActivity : AppCompatActivity() {
         barchart.setNoDataTextColor(R.color.primaryTextColor)
         barchart.setOnTouchListener(swipeDetector)
         barchart.setProportional()
-        barchart.visibility = View.INVISIBLE
+        setProgressBarVisible()
         val values : ArrayList<ParcelableBarEntry>? = savedInstanceState?.getParcelableArrayList(graphValuesSavedState, ParcelableBarEntry::class.java)
         yearValues = values?.toList()
         loadDataIntoGraph()
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -179,12 +176,22 @@ class BikeCounterActivity : AppCompatActivity() {
         }
         barchart.configure()
         runOnUiThread {
-            progressbar.visibility = View.INVISIBLE
-            progressbar2.visibility = View.INVISIBLE
-            progressBarText.visibility = View.INVISIBLE
-            barchart.visibility = View.VISIBLE
-            barchart.data = barData
-            barchart.redraw()
+            setBarChartVisible()
+            barchart.drawData(barData)
         }
+    }
+
+    private fun setProgressBarVisible() {
+        progressbar.visibility = View.VISIBLE
+        progressbar2.visibility = View.VISIBLE
+        progressBarText.visibility = View.VISIBLE
+        barchart.visibility = View.INVISIBLE
+    }
+
+    private fun setBarChartVisible() {
+        progressbar.visibility = View.INVISIBLE
+        progressbar2.visibility = View.INVISIBLE
+        progressBarText.visibility = View.INVISIBLE
+        barchart.visibility = View.VISIBLE
     }
 }

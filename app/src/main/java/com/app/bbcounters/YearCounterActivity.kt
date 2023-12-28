@@ -14,10 +14,11 @@ import android.widget.Spinner
 import androidx.activity.OnBackPressedCallback
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
+import java.util.Calendar
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 import java.util.stream.IntStream
@@ -67,8 +68,10 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     private var lineChart: LineChart? = null
     private var barChart: BarChart? = null
     private var dataFromServer : ParcelableMap? = null
+    private val latchInitSelectedYear = CountDownLatch(1)
     private lateinit var id : String
-    private lateinit var listYears : ArrayList<String>
+    private var listYears : ArrayList<String>? = null
+    private lateinit var selectedYear : String
     private lateinit var yearSpinner : Spinner
     private lateinit var graphTypeSpinner : Spinner
     private lateinit var progressBar : ProgressBar
@@ -78,18 +81,59 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     companion object {
         private const val deviceIdParameter : String = "id"
         private const val yearParameter : String = "years"
-        fun startActivity(context: Context, id : String, listYears: ArrayList<String>) {
+        fun startActivity(context: Context, id : String) {
             val intent = Intent(context, YearCounterActivity::class.java)
             intent.putExtra(deviceIdParameter, id)
-            intent.putExtra(yearParameter, listYears)
             context.startActivity(intent)
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_year_counter)
-        setIcon(this)
+    private fun initYearSpinnerInExecutor() {
+        if (latchInitSelectedYear.count > 0)
+        {
+            val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
+            adapter.setDropDownViewResource(R.layout.year_item_list_layout)
+            listYears?.forEach {  adapter.add(it) }
+            yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+                    if (this@YearCounterActivity.currentYearIndex != position) {
+                        selectedYear = adapter.getItem(position) ?: return
+                        this@YearCounterActivity.currentYearIndex = position
+                        dataFromServer = null
+                        this@YearCounterActivity.loadDataIntoGraph()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) { }
+            }
+            runOnUiThread {
+                val years = listYears ?: return@runOnUiThread
+                val yearIndex = years.size - 1
+                yearSpinner.adapter = adapter
+                yearSpinner.setSelection(yearIndex)
+                currentYearIndex = yearIndex
+                selectedYear = years[yearIndex]
+                latchInitSelectedYear.countDown()
+            }
+            latchInitSelectedYear.await()
+        }
+    }
+
+    private fun init(savedInstanceState: Bundle?) {
+        yearSpinner = findViewById(R.id.list_counter_years)
+        graphTypeSpinner = findViewById(R.id.graph_type_years)
+        lineChart = findViewById(R.id.yearlyHistoryLineChart)
+        barChart = findViewById(R.id.yearlyHistoryBarChart)
+        progressBar = findViewById(R.id.progressBarYearBikeCounter)
+        lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
+        dataFromServer = savedInstanceState?.getParcelable(dataSavedState, ParcelableMap::class.java)
+        id = intent.extras?.getString(deviceIdParameter) ?: return
+        listYears = intent.getSerializableExtra(yearParameter, ArrayList::class.java) as ArrayList<String>?
+        listYears?.sort()
+    }
+
+    private fun initNavigation() {
         basicSwipe.action  = {
             finish()
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
@@ -105,60 +149,39 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
             }
         })
-        lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
-        dataFromServer = savedInstanceState?.getParcelable(dataSavedState, ParcelableMap::class.java)
-        id = intent.extras?.getString(deviceIdParameter) ?: return
-        listYears = intent.getSerializableExtra(yearParameter, ArrayList::class.java) as ArrayList<String>
-        listYears.sort()
-        val yearIndex = savedInstanceState?.getInt(currentYearSavedState) ?: (listYears.size - 1)
-        val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
-        adapter.setDropDownViewResource(R.layout.year_item_list_layout)
-        listYears.forEach {  adapter.add(it) }
-        yearSpinner = findViewById(R.id.list_counter_years)
-        yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val year : String = adapter.getItem(position) ?: return
-                if (this@YearCounterActivity.currentYearIndex != position) {
-                    this@YearCounterActivity.currentYearIndex = position
-                    dataFromServer = null
-                    this@YearCounterActivity.loadDataIntoGraph(year)
-                }
-            }
+    }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
-        }
-        yearSpinner.adapter = adapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_year_counter)
+        setIcon(this)
+        init(savedInstanceState)
+        initNavigation()
         val adapterGraphType = ArrayAdapter(this, R.layout.year_graph_item_layout, resources.getStringArray(R.array.graph_type))
-        graphTypeSpinner = findViewById(R.id.graph_type_years)
         adapterGraphType.setDropDownViewResource(R.layout.year_graph_item_list_layout)
         graphTypeSpinner.adapter = adapterGraphType
         graphTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val isLineGraph = position == 1
-                val yearAdapter = yearSpinner.adapter as ArrayAdapter<String>
-                val currentYearIndex = this@YearCounterActivity.currentYearIndex ?: return
-                val year = yearAdapter.getItem(currentYearIndex) ?: return
                 if (this@YearCounterActivity.lineGraphType != isLineGraph) {
+                    val yearAdapter = yearSpinner.adapter as ArrayAdapter<String>
+                    val currentYearIndex = this@YearCounterActivity.currentYearIndex ?: return
+                    selectedYear = yearAdapter.getItem(currentYearIndex) ?: return
                     this@YearCounterActivity.lineGraphType = isLineGraph
                     dataFromServer = null
-                    this@YearCounterActivity.loadDataIntoGraph(year)
+                    this@YearCounterActivity.loadDataIntoGraph()
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
-        currentYearIndex = yearIndex
-        yearSpinner.setSelection(yearIndex)
-        lineChart = findViewById(R.id.yearlyHistoryLineChart)
         lineChart?.setNoDataText(resources.getString(R.string.loading_data))
         lineChart?.setNoDataTextColor(R.color.primaryTextColor)
         lineChart?.setOnTouchListener(basicSwipe)
-        barChart = findViewById(R.id.yearlyHistoryBarChart)
         barChart?.setNoDataText(resources.getString(R.string.loading_data))
         barChart?.setNoDataTextColor(R.color.primaryTextColor)
         barChart?.setOnTouchListener(basicSwipe)
-        progressBar = findViewById(R.id.progressBarYearBikeCounter)
-        loadDataIntoGraph(listYears[yearIndex])
+        loadDataIntoGraph()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -172,24 +195,23 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         outState.putBoolean(lineGraphTypeSavedState, lineGraphType)
     }
 
-    fun loadDataIntoGraph(year : String) {
+    fun loadDataIntoGraph() {
         if (lineGraphType)
-            loadDataIntoLineGraph(year)
+            loadDataIntoLineGraph()
         else
-            loadDataIntoBarGraph(year)
+            loadDataIntoBarGraph()
     }
-    private fun loadDataIntoLineGraph(year : String) {
-        barChart?.visibility = View.INVISIBLE
-        lineChart?.visibility = View.INVISIBLE
-        progressBar.visibility = View.VISIBLE
+    private fun loadDataIntoLineGraph() {
+        setProgressBarVisible()
         lineChart?.clear()
-        yearSpinner.isEnabled = false
-        graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
+            listYears = yearOfActivityOfCounter(this.id)
+            initYearSpinnerInExecutor()
+            val year = selectedYear
             if (dataFromServer == null) {
                 val data = DataServer().getCounterHistoryYear(id, year)
                 data.onFailure {
-                    askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
+                    askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph() }
                     return@execute
                 }
                 data.onSuccess {
@@ -213,29 +235,24 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             val lineData = LineData(lineDataSet)
 
             runOnUiThread {
-                lineChart?.visibility = View.VISIBLE
-                barChart?.visibility = View.INVISIBLE
-                progressBar.visibility = View.INVISIBLE
-                lineChart?.data = lineData
-                yearSpinner.isEnabled = true
-                graphTypeSpinner.isEnabled = true
-                lineChart?.redraw()
+                setLineChartVisible()
+                lineChart?.drawData(lineData)
             }
 
         }
     }
-    private fun loadDataIntoBarGraph(year : String) {
-        barChart?.visibility = View.INVISIBLE
-        lineChart?.visibility = View.INVISIBLE
-        progressBar.visibility = View.VISIBLE
+
+    private fun loadDataIntoBarGraph() {
+        setProgressBarVisible()
         barChart?.clear()
-        yearSpinner.isEnabled = false
-        graphTypeSpinner.isEnabled = false
         Executors.newSingleThreadExecutor().execute {
+            listYears = yearOfActivityOfCounter(this.id)
+            initYearSpinnerInExecutor()
+            val year = selectedYear
             if (dataFromServer == null) {
                 val data = DataServer().getCounterHistoryYear(id, year)
                 data.onFailure {
-                    askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph(year) }
+                    askIfRetry(this) { this@YearCounterActivity.loadDataIntoLineGraph() }
                     return@execute
                 }
                 data.onSuccess {
@@ -275,14 +292,61 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             barChart?.configure()
             barChart?.setProportional()
             runOnUiThread {
-                barChart?.visibility = View.VISIBLE
-                lineChart?.visibility = View.INVISIBLE
-                progressBar.visibility = View.INVISIBLE
-                barChart?.data = barData
-                yearSpinner.isEnabled = true
-                graphTypeSpinner.isEnabled = true
-                barChart?.redraw()
+                setBarChartVisible()
+                barChart?.drawData(barData)
             }
         }
+    }
+
+    private  fun yearOfActivityOfCounter(name : String) : ArrayList<String>  {
+        val thisYear  = Calendar.getInstance().get(Calendar.YEAR)
+        val server = DataServer()
+        val firstYear = IntStream.range(DataServer.firstYear, thisYear + 1).filter {
+                i ->
+            i == thisYear ||
+                    server.CounterExisted(
+                        name,
+                        i.toString()
+                    )
+        }.findFirst().asInt
+        return IntStream.range(firstYear, 2024).mapToObj { i -> i.toString() }
+            .toArray()
+            .toCollection(ArrayList()) as ArrayList<String>
+    }
+
+    private fun setBarChartVisible() {
+        yearSpinner.visibility = View.VISIBLE
+        graphTypeSpinner.visibility = View.VISIBLE
+        lineChart?.visibility = View.INVISIBLE
+        barChart?.visibility = View.VISIBLE
+        progressBar.visibility = View.INVISIBLE
+        yearSpinner.isEnabled = true
+        graphTypeSpinner.isEnabled = true
+    }
+
+    private fun setLineChartVisible() {
+        yearSpinner.visibility = View.VISIBLE
+        graphTypeSpinner.visibility = View.VISIBLE
+        lineChart?.visibility = View.VISIBLE
+        barChart?.visibility = View.INVISIBLE
+        progressBar.visibility = View.INVISIBLE
+        yearSpinner.isEnabled = true
+        graphTypeSpinner.isEnabled = true
+    }
+
+    private fun setProgressBarVisible() {
+        if (latchInitSelectedYear.count > 0) {
+            yearSpinner.visibility = View.INVISIBLE
+            graphTypeSpinner.visibility = View.INVISIBLE
+        }
+        else {
+            yearSpinner.visibility = View.VISIBLE
+            graphTypeSpinner.visibility = View.VISIBLE
+        }
+        lineChart?.visibility = View.INVISIBLE
+        barChart?.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
+        yearSpinner.isEnabled = false
+        graphTypeSpinner.isEnabled = false
     }
 }

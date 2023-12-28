@@ -2,13 +2,15 @@ package com.app.bbcounters
 
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
 
 fun BarChart.setProportional() {
     this.axisRight.axisMinimum = 0f
     this.axisLeft.axisMinimum = 0f
 }
 
-fun BarChart.redraw() {
+fun BarChart.drawData(barData : BarData) {
+    this.data = barData
     this.notifyDataSetChanged()
     this.invalidate()
 }
