@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
-
 
 class CustomPagerAdapter(private val context : Activity, private val  data : Array<DisplayedCountersData>) : RecyclerView.Adapter<CustomPagerAdapter.ViewHolder>() {
     class ViewHolder(val view : View) : RecyclerView.ViewHolder(view)
@@ -37,7 +37,9 @@ class CustomPagerAdapter(private val context : Activity, private val  data : Arr
             BikeCounterActivity.startActivity(context, data[position].name)
             context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
-
+        holder.view.setOnLongClickListener {
+            graphShortcutCallback(context, data, position, it.x.toInt(), it.y.toInt(), Gravity.NO_GRAVITY)
+        }
     }
 }
 

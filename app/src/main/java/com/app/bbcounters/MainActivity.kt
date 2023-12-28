@@ -1,7 +1,6 @@
 package com.app.bbcounters
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,10 +12,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import java.util.Arrays
-import java.util.Calendar
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
-import java.util.stream.IntStream
 import kotlin.math.abs
 
 
@@ -64,29 +61,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
         holder.view.setOnLongClickListener {
-            val a = arrayOf("History", "Year")
-            val builder = AlertDialog.Builder(context, R.style.dialog_with_rounded_corner)
-                .setItems(a) { _, which ->
-                    when (which) {
-                        0 -> {
-                            BikeCounterActivity.startActivity(context, devices[position].name)
-                            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                        }
-                        1-> {
-                            YearCounterActivity.startActivity(context, devices[position].name)
-                            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                        }
-                        else -> Log.e("test output", "Unknown choice selected")
-                    }
-                }
-            val dialog = builder.create()
-            dialog.window?.attributes?.gravity = Gravity.TOP
-            dialog.window?.attributes?.x = it.x.toInt()
-            dialog.window?.attributes?.y = it.y.toInt()
-
-            dialog.show()
-            dialog.window?.setLayout(500, 400)
-            true
+            graphShortcutCallback(context, devices, position, it.x.toInt(), it.y.toInt(), Gravity.TOP)
         }
         holder.view.setOnTouchListener { v, e -> swipeDetector.onTouch(v, e) }
     }
@@ -133,6 +108,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setIcon(this)
+        init()
         deviceStore = DeviceStore(this, dataServer)
         swipeDetector.action = {
             toast = Toast.makeText(this, R.string.loading_message, Toast.LENGTH_SHORT)
@@ -146,11 +122,7 @@ class MainActivity : AppCompatActivity() {
             (point1.second < 50 && abs(deltaX) < 100 && deltaY < -700)
         }
         swipeDetector.swipeIsRelevant = { this.onTop }
-
-        progressBar = findViewById(R.id.progressBarMain)
-        recyclerView = findViewById(R.id.devicesList)
-        val linearLayoutManager =
-            LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(this)
         recyclerView?.layoutManager = linearLayoutManager
         recyclerView?.setOnTouchListener { view, event -> swipeDetector.onTouch(view, event) }
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -161,13 +133,18 @@ class MainActivity : AppCompatActivity() {
         })
         val data = restoreArrayOfDisplayedCounterData(savedInstanceState)
         if (data == null) {
-            progressBar.visibility = View.VISIBLE
+            setProgressBarVisible()
             loadList()
         }
         else {
             devicesDataArray = data
             recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
         }
+    }
+
+    private fun init() {
+        progressBar = findViewById(R.id.progressBarMain)
+        recyclerView = findViewById(R.id.devicesList)
     }
 
     private fun saveArrayOfDisplayedCounterData(data : Array<DisplayedCountersData>, bundle : Bundle) {
@@ -204,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                     recyclerView?.adapter = DeviceAdapter(data, this, swipeDetector)
                     toast?.cancel()
                     toast = null
-                    progressBar.visibility = View.INVISIBLE
+                    setRecyclerViewVisible()
                 }
             }
             Log.d("test output", "start populating pictures")
@@ -219,5 +196,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun setProgressBarVisible() {
+        progressBar.visibility = View.VISIBLE
+        recyclerView?.visibility = View.INVISIBLE
+    }
+
+    private fun setRecyclerViewVisible() {
+        progressBar.visibility = View.INVISIBLE
+        recyclerView?.visibility = View.VISIBLE
     }
 }
