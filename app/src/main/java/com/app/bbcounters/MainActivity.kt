@@ -29,22 +29,6 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         return DeviceViewHolder(view)
     }
 
-    private  fun yearOfActivityOfCounter(name : String) : ArrayList<String>  {
-        val thisYear  = Calendar.getInstance().get(Calendar.YEAR)
-        val server = DataServer()
-        val firstYear = IntStream.range(DataServer.firstYear, thisYear + 1).filter {
-                i ->
-            i == thisYear ||
-                    server.CounterExisted(
-                        name,
-                        i.toString()
-                    )
-        }.findFirst().asInt
-        return IntStream.range(firstYear, 2024).mapToObj { i -> i.toString() }
-            .toArray()
-            .toCollection(ArrayList()) as ArrayList<String>
-    }
-
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val addressTextView = holder.view.findViewById<TextView>(R.id.deviceAddress)
         val hourCounterView = holder.view.findViewById<TextView>(R.id.hourCounter)
