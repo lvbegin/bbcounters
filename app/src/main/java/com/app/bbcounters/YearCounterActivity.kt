@@ -70,7 +70,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     private var dataFromServer : ParcelableMap? = null
     private val latchInitSelectedYear = CountDownLatch(1)
     private lateinit var id : String
-    private lateinit var listYears : ArrayList<String>
+    private var listYears : ArrayList<String>? = null
     private lateinit var selectedYear : String
     private lateinit var yearSpinner : Spinner
     private lateinit var graphTypeSpinner : Spinner
@@ -93,7 +93,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         {
             val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
             adapter.setDropDownViewResource(R.layout.year_item_list_layout)
-            listYears.forEach {  adapter.add(it) }
+            listYears?.forEach {  adapter.add(it) }
             yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
@@ -108,7 +108,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 override fun onNothingSelected(parent: AdapterView<*>?) { }
             }
             runOnUiThread {
-                val years = listYears
+                val years = listYears  ?: return@runOnUiThread
                 val yearIndex = years.size - 1
                 yearSpinner.adapter = adapter
                 yearSpinner.setSelection(yearIndex)
@@ -129,6 +129,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
         dataFromServer = savedInstanceState?.getParcelable(dataSavedState, ParcelableMap::class.java)
         id = intent.extras?.getString(deviceIdParameter) ?: return
+        listYears = savedInstanceState?.getStringArrayList("listYears")
     }
 
     private fun initNavigation() {
@@ -188,6 +189,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
             outState.putInt(currentYearSavedState, savedCurrentYearIndex)
         if (savedData != null)
             outState.putParcelable(dataSavedState, savedData)
+        outState.putStringArrayList("listYears", listYears)
         outState.putBoolean(lineGraphTypeSavedState, lineGraphType)
     }
 
@@ -201,7 +203,8 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         setProgressBarVisible()
         lineChart?.clear()
         Executors.newSingleThreadExecutor().execute {
-            listYears = yearOfActivityOfCounter(this.id)
+            if (listYears == null)
+                listYears = yearOfActivityOfCounter(this.id)
             initYearSpinnerInExecutor()
             val year = selectedYear
             if (dataFromServer == null) {
@@ -242,7 +245,8 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         setProgressBarVisible()
         barChart?.clear()
         Executors.newSingleThreadExecutor().execute {
-            listYears = yearOfActivityOfCounter(this.id)
+            if (listYears == null)
+                listYears = yearOfActivityOfCounter(this.id)
             initYearSpinnerInExecutor()
             val year = selectedYear
             if (dataFromServer == null) {
