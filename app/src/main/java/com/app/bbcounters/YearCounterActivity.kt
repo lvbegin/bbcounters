@@ -70,7 +70,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     private var dataFromServer : ParcelableMap? = null
     private val latchInitSelectedYear = CountDownLatch(1)
     private lateinit var id : String
-    private var listYears : ArrayList<String>? = null
+    private lateinit var listYears : ArrayList<String>
     private lateinit var selectedYear : String
     private lateinit var yearSpinner : Spinner
     private lateinit var graphTypeSpinner : Spinner
@@ -93,7 +93,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         {
             val adapter = ArrayAdapter<String>(this, R.layout.year_item_layout)
             adapter.setDropDownViewResource(R.layout.year_item_list_layout)
-            listYears?.forEach {  adapter.add(it) }
+            listYears.forEach {  adapter.add(it) }
             yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
@@ -108,7 +108,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                 override fun onNothingSelected(parent: AdapterView<*>?) { }
             }
             runOnUiThread {
-                val years = listYears ?: return@runOnUiThread
+                val years = listYears
                 val yearIndex = years.size - 1
                 yearSpinner.adapter = adapter
                 yearSpinner.setSelection(yearIndex)
@@ -129,8 +129,6 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
         lineGraphType = savedInstanceState?.getBoolean(lineGraphTypeSavedState) ?: false
         dataFromServer = savedInstanceState?.getParcelable(dataSavedState, ParcelableMap::class.java)
         id = intent.extras?.getString(deviceIdParameter) ?: return
-        listYears = intent.getSerializableExtra(yearParameter, ArrayList::class.java) as ArrayList<String>?
-        listYears?.sort()
     }
 
     private fun initNavigation() {
