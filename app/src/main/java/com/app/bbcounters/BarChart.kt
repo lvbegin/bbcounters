@@ -25,3 +25,8 @@ fun BarChart.configure() {
     this.axisLeft.setDrawGridLines(false)
     this.axisRight.setDrawGridLines(false)
 }
+
+fun BarChart.configureNoDataMessage() {
+    this.setNoDataText(resources.getString(R.string.loading_data))
+    this.setNoDataTextColor(R.color.primaryTextColor)
+}

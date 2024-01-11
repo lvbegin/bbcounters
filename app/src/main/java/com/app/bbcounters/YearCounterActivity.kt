@@ -175,11 +175,9 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
-        lineChart?.setNoDataText(resources.getString(R.string.loading_data))
-        lineChart?.setNoDataTextColor(R.color.primaryTextColor)
+        lineChart?.configureNoDataMessage()
         lineChart?.setOnTouchListener(basicSwipe)
-        barChart?.setNoDataText(resources.getString(R.string.loading_data))
-        barChart?.setNoDataTextColor(R.color.primaryTextColor)
+        barChart?.configureNoDataMessage()
         barChart?.setOnTouchListener(basicSwipe)
         loadDataIntoGraph()
     }

@@ -15,6 +15,11 @@ fun LineChart.configure() {
     this.axisRight.textSize = 12f
 }
 
+fun LineChart.configureNoDataMessage() {
+    this.setNoDataText(resources.getString(R.string.loading_data))
+    this.setNoDataTextColor(R.color.primaryTextColor)
+}
+
 fun LineChart.drawData(lineData: LineData)
 {
     this.data = lineData
