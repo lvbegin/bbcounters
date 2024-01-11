@@ -307,7 +307,7 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
                         i.toString()
                     )
         }.findFirst().asInt
-        return IntStream.range(firstYear, 2024).mapToObj { i -> i.toString() }
+        return IntStream.range(firstYear, thisYear + 1).mapToObj { i -> i.toString() }
             .toArray()
             .toCollection(ArrayList()) as ArrayList<String>
     }
