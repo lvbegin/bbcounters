@@ -51,7 +51,7 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
                                         .toArray { size -> arrayOfNulls<DisplayedCountersData>(size) }
                                         as Array<DisplayedCountersData>
             val positionWithPicture = devicesWIthPicture.indexOfFirst {
-                device -> device?.name == devices[position].name
+                device -> device.name == devices[position].name
             }
             PictureActivity.startActivity(context, devicesWIthPicture, positionWithPicture, coordinates[0].toFloat(), coordinates[1].toFloat())
         }
