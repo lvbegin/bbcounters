@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -22,7 +21,6 @@ import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 import androidx.activity.OnBackPressedCallback
-import java.util.stream.IntStream
 
 class ParcelableBarEntry(v1 : Float, v2 : Float) : BarEntry(v1, v2), Parcelable {
     constructor(parcel: Parcel) : this(parcel.readFloat(), parcel.readFloat())
@@ -72,22 +70,16 @@ class BikeCounterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_bike_counter)
         setIcon(this)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
-            }
+            override fun handleOnBackPressed() = finishWithScrollingLeftToRight()
         })
         swipeDetector.action  = {
             if (swipeLeft)
             {
                 YearCounterActivity.startActivity(this, id)
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                setScrollingAnimationRightToLeft()
             }
             else
-            {
-                finish()
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
-            }
+                finishWithScrollingLeftToRight()
         }
         swipeDetector.condition = { point1, point2 ->
             val deltaX =  point1.first - point2.first

@@ -2,9 +2,6 @@ package com.app.bbcounters
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.Window as Window
 
 fun graphShortcutCallback(context: Activity, data : Array<DisplayedCountersData>, position : Int,
                           x : Int, y : Int, gravity : Int) : Boolean {
@@ -18,11 +15,11 @@ fun graphShortcutCallback(context: Activity, data : Array<DisplayedCountersData>
             when (which) {
                 0 -> {
                     BikeCounterActivity.startActivity(context, data[position].name)
-                    context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                    context.setScrollingAnimationRightToLeft()
                 }
                 1 -> {
                     YearCounterActivity.startActivity(context, data[position].name)
-                    context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                    context.setScrollingAnimationRightToLeft()
                 }
                 else -> Log.e("test output", "Unknown choice selected")
             }

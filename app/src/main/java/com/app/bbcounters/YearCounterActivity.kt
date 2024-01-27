@@ -133,20 +133,14 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     }
 
     private fun initNavigation() {
-        basicSwipe.action  = {
-            finish()
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
-        }
+        basicSwipe.action  = { finishWithScrollingLeftToRight() }
         basicSwipe.condition = { point1, point2 ->
             val deltaX =  point2.first - point1.first
             val deltaY = point1.second - point2.second
             (deltaX > 300 && abs(deltaY) < 100)
         }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_rigth)
-            }
+            override fun handleOnBackPressed() = finishWithScrollingLeftToRight()
         })
     }
 
