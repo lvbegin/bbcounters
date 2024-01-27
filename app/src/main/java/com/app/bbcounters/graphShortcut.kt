@@ -8,9 +8,12 @@ import android.view.Window as Window
 
 fun graphShortcutCallback(context: Activity, data : Array<DisplayedCountersData>, position : Int,
                           x : Int, y : Int, gravity : Int) : Boolean {
-    val a = arrayOf("History", "Year")
+    val a = arrayOf(
+        context.resources.getString(R.string.graph_name_history),
+        context.resources.getString(R.string.graph_name_year)
+    )
     val builder = AlertDialog.Builder(context, R.style.dialog_with_rounded_corner)
-        .setTitle("Graphs")
+        .setTitle(context.resources.getString(R.string.graphs_list_title))
         .setItems(a) { _, which ->
             when (which) {
                 0 -> {

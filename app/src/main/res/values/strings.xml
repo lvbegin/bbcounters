@@ -22,6 +22,9 @@
     <string name="counter_picture_description">Counter picture</string>
     <string name="separator">:</string>
 
+    <string name="graphs_list_title">Graphs</string>
+    <string name="graph_name_history">History</string>
+    <string name="graph_name_year">Year</string>
     <string-array name="graph_type">
         <item>Bar Graph</item>
         <item>Line Graph</item>
