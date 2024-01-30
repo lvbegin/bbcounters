@@ -1,5 +1,6 @@
 package com.app.bbcounters
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -58,10 +59,11 @@ class BikeCounterActivity : AppCompatActivity() {
 
     companion object {
         private const val deviceIdParameter = "id"
-        fun startActivity(context: Context, id : String) {
+        fun startActivity(context: Activity, id : String) {
             val intent = Intent(context, BikeCounterActivity::class.java)
             intent.putExtra(deviceIdParameter, id)
             context.startActivity(intent)
+            context.setScrollingAnimationRightToLeft()
         }
     }
 
@@ -74,10 +76,7 @@ class BikeCounterActivity : AppCompatActivity() {
         })
         swipeDetector.action  = {
             if (swipeLeft)
-            {
                 YearCounterActivity.startActivity(this, id)
-                setScrollingAnimationRightToLeft()
-            }
             else
                 finishWithScrollingLeftToRight()
         }

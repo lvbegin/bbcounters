@@ -35,7 +35,6 @@ class CustomPagerAdapter(private val context : Activity, private val  data : Arr
             imageView.setImageResource(R.drawable.ic_launcher_foreground)
         holder.view.setOnClickListener {
             BikeCounterActivity.startActivity(context, data[position].name)
-            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
         holder.view.setOnLongClickListener {
             graphShortcutCallback(context, data, position, it.x.toInt(), it.y.toInt(), Gravity.NO_GRAVITY)

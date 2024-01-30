@@ -1,5 +1,6 @@
 package com.app.bbcounters
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -81,10 +82,11 @@ class YearCounterActivity : androidx.appcompat.app.AppCompatActivity() {
     companion object {
         private const val deviceIdParameter : String = "id"
         private const val yearParameter : String = "years"
-        fun startActivity(context: Context, id : String) {
+        fun startActivity(context: Activity, id : String) {
             val intent = Intent(context, YearCounterActivity::class.java)
             intent.putExtra(deviceIdParameter, id)
             context.startActivity(intent)
+            context.setScrollingAnimationRightToLeft()
         }
     }
 

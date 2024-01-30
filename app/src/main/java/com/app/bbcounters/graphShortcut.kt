@@ -13,14 +13,8 @@ fun graphShortcutCallback(context: Activity, data : Array<DisplayedCountersData>
         .setTitle(context.resources.getString(R.string.graphs_list_title))
         .setItems(a) { _, which ->
             when (which) {
-                0 -> {
-                    BikeCounterActivity.startActivity(context, data[position].name)
-                    context.setScrollingAnimationRightToLeft()
-                }
-                1 -> {
-                    YearCounterActivity.startActivity(context, data[position].name)
-                    context.setScrollingAnimationRightToLeft()
-                }
+                0 -> BikeCounterActivity.startActivity(context, data[position].name)
+                1 -> YearCounterActivity.startActivity(context, data[position].name)
                 else -> Log.e("test output", "Unknown choice selected")
             }
         }

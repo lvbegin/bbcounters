@@ -58,7 +58,6 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
         
         holder.view.setOnClickListener {
             BikeCounterActivity.startActivity(context, devices[position].name)
-            context.setScrollingAnimationRightToLeft()
         }
         holder.view.setOnLongClickListener {
             graphShortcutCallback(context, devices, position, it.x.toInt(), it.y.toInt(), Gravity.TOP)
