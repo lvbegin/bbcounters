@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import java.util.concurrent.CountDownLatch
@@ -53,10 +55,11 @@ class PictureActivity : AppCompatActivity() {
         private const val yName = "y"
         fun startActivity(context: Context, data : Array<DisplayedCountersData>, index : Int, x : Float, y : Float) {
             val intent = Intent(context, PictureActivity::class.java)
-            intent.putExtra(dataName, data)
+            intent.putExtra(dataName, data.toCollection(ArrayList()))
             intent.putExtra(indexName, index)
             intent.putExtra(xName, x)
             intent.putExtra(yName, y)
+
             context.startActivity(intent)
         }
     }
@@ -65,8 +68,7 @@ class PictureActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_picture)
 
-
-        val dataFromIntent = intent.extras?.getParcelableArray(dataName, DisplayedCountersData::class.java)
+        val dataFromIntent  = IntentCompat.getParcelableArrayListExtra(intent, dataName, DisplayedCountersData::class.java)?.toTypedArray()
         val indexFromIntent = intent.extras?.getInt(indexName)
         val xFromIntent = intent.extras?.getFloat(xName)
         val yFromIntent = intent.extras?.getFloat(yName)
