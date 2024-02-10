@@ -68,6 +68,7 @@ class PictureActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_picture)
 
+        // IntentCompat used because of a bug in Android APO 33
         val dataFromIntent  = IntentCompat.getParcelableArrayListExtra(intent, dataName, DisplayedCountersData::class.java)?.toTypedArray()
         val indexFromIntent = intent.extras?.getInt(indexName)
         val xFromIntent = intent.extras?.getFloat(xName)
