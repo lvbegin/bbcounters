@@ -21,6 +21,8 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             private val context : Activity, private val swipeDetector : OnTouchListener) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
     class DeviceViewHolder(val view : View) : RecyclerView.ViewHolder(view)
 
+    var clickX : Int = 0
+    var clickY : Int = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.device_layout, parent, false)
         return DeviceViewHolder(view)
@@ -60,9 +62,18 @@ class DeviceAdapter(private val devices : Array<DisplayedCountersData>,
             BikeCounterActivity.startActivity(context, devices[position].name)
         }
         holder.view.setOnLongClickListener {
-            graphShortcutCallback(context, devices, position, it.x.toInt(), it.y.toInt(), Gravity.TOP)
+            val x = it.x.toInt() + this@DeviceAdapter.clickX
+            val y = it.y.toInt() + this@DeviceAdapter.clickY
+            graphShortcutCallback(context, devices, position, x, y, Gravity.TOP + Gravity.LEFT)
         }
-        holder.view.setOnTouchListener { v, e -> swipeDetector.onTouch(v, e) }
+        holder.view.setOnTouchListener { v, e ->
+            if (e?.action == MotionEvent.ACTION_DOWN)
+            {
+                clickX = e?.x?.toInt() ?: 0
+                clickY = e?.y?.toInt() ?: 0
+            }
+            swipeDetector.onTouch(v, e)
+        }
     }
 
     override fun getItemCount(): Int = devices.size

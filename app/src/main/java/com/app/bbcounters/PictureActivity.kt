@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -21,6 +22,9 @@ import java.util.concurrent.Executors
 
 class CustomPagerAdapter(private val context : Activity, private val  data : Array<DisplayedCountersData>) : RecyclerView.Adapter<CustomPagerAdapter.ViewHolder>() {
     class ViewHolder(val view : View) : RecyclerView.ViewHolder(view)
+
+    var clickX  : Int = 0
+    var clickY  : Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.pager_layout, parent, false)
@@ -39,8 +43,20 @@ class CustomPagerAdapter(private val context : Activity, private val  data : Arr
             BikeCounterActivity.startActivity(context, data[position].name)
         }
         holder.view.setOnLongClickListener {
-            graphShortcutCallback(context, data, position, it.x.toInt(), it.y.toInt(), Gravity.NO_GRAVITY)
+            val x = this@CustomPagerAdapter.clickX
+            val y = this@CustomPagerAdapter.clickY
+            graphShortcutCallback(context, data, position, x, y, Gravity.LEFT + Gravity.TOP)
         }
+        holder.view.setOnTouchListener( object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                if (p1?.action == MotionEvent.ACTION_DOWN)
+                {
+                    clickX = p1?.x?.toInt() ?: 0
+                    clickY = p1?.y?.toInt() ?: 0
+                }
+                return false
+            }
+        })
     }
 }
 
