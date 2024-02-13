@@ -1,16 +1,8 @@
 package com.app.bbcounters
 
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Parcel
 import android.os.Parcelable
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.lang.Exception
-import kotlin.contracts.contract
 
 
 class DisplayedCountersData private constructor(val name : String, val address : String,
